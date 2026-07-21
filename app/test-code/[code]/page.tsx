@@ -563,7 +563,7 @@ export default function TestCodePage() {
   if (!testRecord || !categorySlug) {
     return (
       <div className="flex flex-col min-h-screen bg-bg-page">
-        <AppHeader domain="test-codes" activeTab="test-codes" />
+        <AppHeader domain="consents" activeTab="consents" />
         <main className="flex flex-col w-full max-w-[1280px] mx-auto" style={{ paddingTop: 64, paddingLeft: 64 }}>
           <p style={bodyText}>Test code not found.</p>
         </main>
@@ -573,7 +573,7 @@ export default function TestCodePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg-page">
-      <AppHeader domain="test-codes" activeTab="test-codes" />
+      <AppHeader domain="consents" activeTab="consents" />
 
       <main className="flex flex-col w-full bg-bg-page">
         <div className="flex flex-col w-full max-w-[1280px] mx-auto" style={{ paddingTop: 32, paddingBottom: 64, paddingLeft: 64, paddingRight: 64, gap: 32 }}>

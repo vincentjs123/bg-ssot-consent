@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { MagnifyingGlass, X, ArrowLeft, DotsThree } from "@phosphor-icons/react";
+import { MagnifyingGlass, X, ArrowLeft } from "@phosphor-icons/react";
 import AppHeader from "@/components/AppHeader";
 import { TEST_CATALOG } from "@/lib/test-catalog";
 import {
@@ -17,7 +17,7 @@ import {
   type Suggestion,
   type SuggestionType,
 } from "@/lib/search-data";
-import { getConsentMapping, testCodeMatchesFilters } from "@/lib/consent-mapping";
+import { testCodeMatchesFilters } from "@/lib/consent-mapping";
 import { TEST_CODE_CONSENTS } from "@/lib/consent-content";
 
 const STATUS_OPTIONS = ["Active", "Pending", "Archived"] as const;
@@ -93,7 +93,7 @@ function Checkbox({
       >
         {checked && (
           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-            <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M1 4L3.5 6.5L9 1" stroke="var(--button-primary-btn-primary-text)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )}
       </div>
@@ -142,7 +142,8 @@ function SearchPageInner() {
   const initialQ = searchParams.get("q") ?? "";
   const initialType = (searchParams.get("type") as SelectionType) ?? null;
 
-  const [query, setQuery] = useState(initialQ);
+  const [inputValue, setInputValue] = useState(initialQ);
+  const [committedQuery, setCommittedQuery] = useState(initialQ);
   const [panelOpen, setPanelOpen] = useState(true);
 
   const [categories, setCategories] = useState<Record<string, boolean>>(
@@ -164,7 +165,8 @@ function SearchPageInner() {
   useEffect(() => {
     const q = searchParams.get("q") ?? "";
     const type = (searchParams.get("type") as SelectionType) ?? null;
-    setQuery(q);
+    setInputValue(q);
+    setCommittedQuery(q);
     setCategories(initCategories(type, q));
     setSections(initSections(type, q));
     setResponses(initResponses(type, q));
@@ -178,7 +180,7 @@ function SearchPageInner() {
   }
 
   const filteredResults = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = committedQuery.trim().toLowerCase();
 
     return TEST_CATALOG.filter((row) => {
       // Text search
@@ -196,7 +198,7 @@ function SearchPageInner() {
 
       return true;
     });
-  }, [query, categories, sections, responses]);
+  }, [committedQuery, categories, sections, responses]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -216,23 +218,24 @@ function SearchPageInner() {
     const lq = q.toLowerCase().trim();
     if (!lq) return [];
     const results: Suggestion[] = [];
-    CONSENT_CATEGORIES.filter((c) => c.toLowerCase().includes(lq)).slice(0, 4)
+    CONSENT_CATEGORIES.filter((c) => c.toLowerCase().includes(lq)).sort((a, b) => a.localeCompare(b)).slice(0, 5)
       .forEach((c) => results.push({ type: "category", label: c }));
-    CONSENT_SECTIONS.filter((c) => c.toLowerCase().includes(lq)).slice(0, 4)
+    CONSENT_SECTIONS.filter((c) => c.toLowerCase().includes(lq)).sort((a, b) => a.localeCompare(b)).slice(0, 5)
       .forEach((c) => results.push({ type: "section", label: c }));
-    CONSENTS_WITH_RESPONSES.filter((c) => c.toLowerCase().includes(lq)).slice(0, 4)
+    CONSENTS_WITH_RESPONSES.filter((c) => c.toLowerCase().includes(lq)).sort((a, b) => a.localeCompare(b)).slice(0, 5)
       .forEach((c) => results.push({ type: "response", label: c }));
     const seenCodes = new Set<string>();
     TEST_CATALOG.filter((r) => r.testCode.toLowerCase().includes(lq) || r.testName.toLowerCase().includes(lq))
       .filter((r) => { if (seenCodes.has(r.testCode)) return false; seenCodes.add(r.testCode); return true; })
+      .sort((a, b) => { const an = parseInt(a.testCode, 10), bn = parseInt(b.testCode, 10); return (!isNaN(an) && !isNaN(bn)) ? an - bn : a.testCode.localeCompare(b.testCode); })
       .slice(0, 5)
       .forEach((r) => results.push({ type: "test-code", label: r.testName, sublabel: r.testCode }));
-    TRF_NAMES.filter((t) => t.toLowerCase().includes(lq)).slice(0, 4)
+    TRF_NAMES.filter((t) => t.toLowerCase().includes(lq)).sort((a, b) => a.localeCompare(b)).slice(0, 5)
       .forEach((t) => results.push({ type: "trf", label: t }));
     return results;
   }
 
-  const suggestions = buildSuggestions(query);
+  const suggestions = buildSuggestions(inputValue);
 
   function handleSuggestionClick(s: Suggestion) {
     setDropdownOpen(false);
@@ -251,9 +254,10 @@ function SearchPageInner() {
 
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const trimmed = query.trim();
+    const trimmed = inputValue.trim();
     if (!trimmed) return;
     setDropdownOpen(false);
+    setCommittedQuery(trimmed);
     router.replace(`/search?q=${encodeURIComponent(trimmed)}`);
   }
 
@@ -317,23 +321,24 @@ function SearchPageInner() {
                       color: "var(--text-text-primary)",
                     }}
                     placeholder="Search by Test Code, Consent Category or Consent Section"
-                    value={query}
-                    onChange={(e) => { setQuery(e.target.value); setDropdownOpen(e.target.value.trim().length > 0); }}
-                    onFocus={() => query.trim() && setDropdownOpen(true)}
+                    value={inputValue}
+                    onChange={(e) => { setInputValue(e.target.value); setDropdownOpen(e.target.value.trim().length > 0); }}
+                    onFocus={() => inputValue.trim() && setDropdownOpen(true)}
                     onKeyDown={(e) => {
                       if (e.key === "Escape") setDropdownOpen(false);
                       if (e.key === "Enter") {
                         e.preventDefault();
-                        const trimmed = query.trim();
+                        const trimmed = inputValue.trim();
                         if (!trimmed) return;
                         setDropdownOpen(false);
+                        setCommittedQuery(trimmed);
                         router.replace(`/search?q=${encodeURIComponent(trimmed)}`);
                       }
                     }}
                     autoComplete="off"
                   />
-                  {query && (
-                    <button type="button" onClick={() => { setQuery(""); setDropdownOpen(false); }} className="shrink-0">
+                  {inputValue && (
+                    <button type="button" onClick={() => { setInputValue(""); setCommittedQuery(""); setDropdownOpen(false); }} className="shrink-0">
                       <X size={14} className="text-text-secondary" />
                     </button>
                   )}
@@ -375,11 +380,11 @@ function SearchPageInner() {
                     <button
                       className="flex items-center w-full text-left hover:bg-bg-body"
                       style={{ padding: "10px 12px", gap: 8 }}
-                      onMouseDown={(e) => { e.preventDefault(); setDropdownOpen(false); router.replace(`/search?q=${encodeURIComponent(query.trim())}`); }}
+                      onMouseDown={(e) => { e.preventDefault(); setDropdownOpen(false); setCommittedQuery(inputValue.trim()); router.replace(`/search?q=${encodeURIComponent(inputValue.trim())}`); }}
                     >
                       <MagnifyingGlass size={14} className="text-text-secondary shrink-0" />
                       <span style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 400, fontSize: 14, lineHeight: "20px", color: "var(--text-text-secondary)" }}>
-                        Search for &ldquo;{query}&rdquo;
+                        Search for &ldquo;{inputValue}&rdquo;
                       </span>
                     </button>
                   </div>
@@ -442,47 +447,35 @@ function SearchPageInner() {
                   ))}
                 </FilterSection>
 
+                {/* Consent Sections — hidden */}
+                {false && <>
                 <div style={{ height: 1, background: "var(--borders-border-subtle, var(--borders-border-subtle))" }} />
-
-                {/* Consent Sections */}
                 <FilterSection title="Consent Sections">
                   {CONSENT_SECTIONS.map((c) => (
-                    <Checkbox
-                      key={c}
-                      checked={sections[c]}
-                      onChange={(v) => setSections((prev) => ({ ...prev, [c]: v }))}
-                      label={c}
-                    />
+                    <Checkbox key={c} checked={sections[c]} onChange={(v) => setSections((prev) => ({ ...prev, [c]: v }))} label={c} />
                   ))}
                 </FilterSection>
+                </>}
 
+                {/* Consents with Responses — hidden */}
+                {false && <>
                 <div style={{ height: 1, background: "var(--borders-border-subtle, var(--borders-border-subtle))" }} />
-
-                {/* Consents with Responses */}
                 <FilterSection title="Consents with Responses">
                   {CONSENTS_WITH_RESPONSES.map((c) => (
-                    <Checkbox
-                      key={c}
-                      checked={responses[c]}
-                      onChange={(v) => setResponses((prev) => ({ ...prev, [c]: v }))}
-                      label={c}
-                    />
+                    <Checkbox key={c} checked={responses[c]} onChange={(v) => setResponses((prev) => ({ ...prev, [c]: v }))} label={c} />
                   ))}
                 </FilterSection>
+                </>}
 
+                {/* Status — hidden */}
+                {false && <>
                 <div style={{ height: 1, background: "var(--borders-border-subtle, var(--borders-border-subtle))" }} />
-
-                {/* Status */}
                 <FilterSection title="Status">
                   {STATUS_OPTIONS.map((s) => (
-                    <Checkbox
-                      key={s}
-                      checked={statuses[s]}
-                      onChange={(v) => setStatuses((prev) => ({ ...prev, [s]: v }))}
-                      label={s}
-                    />
+                    <Checkbox key={s} checked={statuses[s]} onChange={(v) => setStatuses((prev) => ({ ...prev, [s]: v }))} label={s} />
                   ))}
                 </FilterSection>
+                </>}
 
                 {/* Reset All */}
                 <button
@@ -547,19 +540,16 @@ function SearchPageInner() {
               <div className="w-full overflow-x-auto">
                 <table className="w-full border-collapse">
                   <thead>
-                    <tr style={{ borderBottom: "1px solid var(--borders-border-subtle, var(--borders-border-subtle))" }}>
-                      <th style={{ ...HEADER_CELL_STYLE, width: 160 }}>Test</th>
-                      <th style={{ ...HEADER_CELL_STYLE, width: 1, whiteSpace: "nowrap", paddingLeft: 16 }}>Consent Category</th>
-                      <th style={{ ...HEADER_CELL_STYLE, width: 1, whiteSpace: "nowrap", paddingLeft: 16 }}>Consent Section</th>
-                      <th style={{ ...HEADER_CELL_STYLE, width: 1, whiteSpace: "nowrap", paddingLeft: 16 }}>Consents with Responses</th>
-                      <th style={{ ...HEADER_CELL_STYLE, width: 1, whiteSpace: "nowrap", paddingLeft: 16 }}>Actions</th>
+                    <tr style={{ borderBottom: "1px solid var(--borders-border-subtle)" }}>
+                      <th style={{ ...HEADER_CELL_STYLE, width: 80, whiteSpace: "nowrap" }}>Code</th>
+                      <th style={{ ...HEADER_CELL_STYLE, paddingLeft: 16 }}>Name</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredResults.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={5}
+                          colSpan={2}
                           style={{
                             ...CELL_STYLE,
                             textAlign: "center",
@@ -575,35 +565,20 @@ function SearchPageInner() {
                       filteredResults.map((row, i) => (
                         <tr
                           key={`${row.testCode}-${i}`}
-                          style={{ borderBottom: "1px solid var(--borders-border-subtle, var(--borders-border-subtle))" }}
+                          onClick={() => {
+                            const href = TEST_CODE_CONSENTS[row.testCode]
+                              ? `/test-code/${encodeURIComponent(row.testCode)}`
+                              : `/test-code-details/${encodeURIComponent(row.testCode)}`;
+                            router.push(href);
+                          }}
+                          style={{
+                            borderBottom: "1px solid var(--borders-border-subtle)",
+                            cursor: "pointer",
+                          }}
+                          className="hover:bg-bg-body transition-colors"
                         >
-                          <td style={{ ...CELL_STYLE, maxWidth: 160 }}>
-                            <div>{row.testCode}</div>
-                            <div style={{ color: "var(--text-text-secondary)" }}>{row.testName}</div>
-                          </td>
-                          {(() => {
-                            const m = getConsentMapping(row.testCode);
-                            return (
-                              <>
-                                <td style={{ ...CELL_STYLE, paddingLeft: 16, whiteSpace: "nowrap" }}>{m.category ?? "—"}</td>
-                                <td style={{ ...CELL_STYLE, paddingLeft: 16, whiteSpace: "nowrap" }}>
-                                  {m.sections.map((s, i) => <div key={i}>{s}</div>)}
-                                </td>
-                                <td style={{ ...CELL_STYLE, paddingLeft: 16, whiteSpace: "nowrap" }}>
-                                  {m.responses.map((r, i) => <div key={i}>{r}</div>)}
-                                </td>
-                              </>
-                            );
-                          })()}
-                          <td style={{ ...CELL_STYLE, paddingLeft: 16, textAlign: "center" }}>
-                            <button
-                              className="flex items-center justify-center"
-                              style={{ width: 32, height: 24, margin: "0 auto" }}
-                              aria-label="More actions"
-                            >
-                              <DotsThree size={20} weight="bold" className="text-text-secondary" />
-                            </button>
-                          </td>
+                          <td style={{ ...CELL_STYLE, width: 80, whiteSpace: "nowrap" }}>{row.testCode}</td>
+                          <td style={{ ...CELL_STYLE, paddingLeft: 16 }}>{row.testName}</td>
                         </tr>
                       ))
                     )}

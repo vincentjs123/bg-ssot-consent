@@ -288,15 +288,18 @@ function buildSuggestions(query: string): Suggestion[] {
   const results: Suggestion[] = [];
 
   SEARCH_CATEGORIES.filter((c) => c.toLowerCase().includes(q))
-    .slice(0, 4)
+    .sort((a, b) => a.localeCompare(b))
+    .slice(0, 5)
     .forEach((c) => results.push({ type: "category", label: c }));
 
   SEARCH_SECTIONS.filter((c) => c.toLowerCase().includes(q))
-    .slice(0, 4)
+    .sort((a, b) => a.localeCompare(b))
+    .slice(0, 5)
     .forEach((c) => results.push({ type: "section", label: c }));
 
   SEARCH_RESPONSES.filter((c) => c.toLowerCase().includes(q))
-    .slice(0, 4)
+    .sort((a, b) => a.localeCompare(b))
+    .slice(0, 5)
     .forEach((c) => results.push({ type: "response", label: c }));
 
   const seenCodes = new Set<string>();
@@ -304,13 +307,20 @@ function buildSuggestions(query: string): Suggestion[] {
     (r) => r.testCode.toLowerCase().includes(q) || r.testName.toLowerCase().includes(q)
   )
     .filter((r) => { if (seenCodes.has(r.testCode)) return false; seenCodes.add(r.testCode); return true; })
+    .sort((a, b) => {
+      const aNum = parseInt(a.testCode, 10);
+      const bNum = parseInt(b.testCode, 10);
+      if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+      return a.testCode.localeCompare(b.testCode);
+    })
     .slice(0, 5)
     .forEach((r) =>
       results.push({ type: "test-code", label: r.testName, sublabel: r.testCode })
     );
 
   TRF_NAMES.filter((t) => t.toLowerCase().includes(q))
-    .slice(0, 4)
+    .sort((a, b) => a.localeCompare(b))
+    .slice(0, 5)
     .forEach((t) => results.push({ type: "trf", label: t }));
 
   return results;
