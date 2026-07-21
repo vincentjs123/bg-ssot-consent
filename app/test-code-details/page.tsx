@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { CaretDown, CheckCircle, X } from "@phosphor-icons/react";
@@ -94,7 +94,7 @@ const TOAST_MESSAGES: Record<string, string> = {
   "delete-request": "Your delete request for test code 2010 has been submitted successfully.",
 };
 
-export default function TestCodeDetails() {
+function TestCodeDetailsInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const role = useRole();
@@ -323,5 +323,13 @@ export default function TestCodeDetails() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function TestCodeDetails() {
+  return (
+    <Suspense>
+      <TestCodeDetailsInner />
+    </Suspense>
   );
 }

@@ -500,6 +500,14 @@ function SearchPageInner() {
   );
 }
 
+function SearchPageInner() {
+  return (
+    <Suspense>
+      <SearchPageInner />
+    </Suspense>
+  );
+}
+
 export default function SearchPage() {
   return (
     <Suspense>

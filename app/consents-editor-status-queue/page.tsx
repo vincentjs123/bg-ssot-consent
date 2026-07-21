@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowUp, ArrowDown, ArrowsDownUp, DotsThree, CheckCircle, X } from "@phosphor-icons/react";
 import AppHeader from "@/components/AppHeader";
@@ -40,7 +40,7 @@ const TOAST_MESSAGES: Record<string, string> = {
   submitted: "Your edit request has been submitted successfully.",
 };
 
-export default function ConsentsEditorStatusQueue() {
+function ConsentsEditorStatusQueueInner() {
   useRoleGuard(["administrator", "data-administrator"]);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -152,5 +152,13 @@ export default function ConsentsEditorStatusQueue() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function ConsentsEditorStatusQueue() {
+  return (
+    <Suspense>
+      <ConsentsEditorStatusQueueInner />
+    </Suspense>
   );
 }

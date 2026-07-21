@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { DotsThree, ArrowUp, ArrowDown, ArrowsDownUp, CheckCircle, X } from "@phosphor-icons/react";
@@ -51,7 +51,7 @@ const TOAST_MESSAGES: Record<string, string> = {
   created: "The test code has been created successfully.",
 };
 
-export default function EditorStatusQueue() {
+function EditorStatusQueueInner() {
   useRoleGuard(["administrator", "data-administrator"]);
   const role = useRole();
   const searchParams = useSearchParams();
@@ -230,5 +230,13 @@ export default function EditorStatusQueue() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function EditorStatusQueue() {
+  return (
+    <Suspense>
+      <EditorStatusQueueInner />
+    </Suspense>
   );
 }
