@@ -112,9 +112,12 @@ export interface ContentBlock {
 }
 
 export interface CKRItem {
+  slug: string;
   title: string;
   portal: string;
   paper: string | null;
+  testCodes: string;
+  trfs: string[];
 }
 
 export interface SectionPageMeta {
@@ -458,13 +461,88 @@ export const CATEGORY_SECTION_CARDS: Record<string, CategorySectionCard[]> = {
 // ─── CKR items ─────────────────────────────────────────────────────────────────
 
 export const CKR_ITEMS: CKRItem[] = [
-  { title: "Statement of Medical Necessity and Consent to Terms & Conditions for Test Order", portal: LANG.CKR_SMN, paper: null },
-  { title: "Use of Data and Specimen for Research Purposes", portal: LANG.CKR_USE_OF_DATA, paper: null },
-  { title: "For Samples Submitted from New York State Residents", portal: LANG.CKR_NYS, paper: null },
-  { title: "Reporting of ACMG Secondary Findings", portal: LANG.CKR_ACMG, paper: null },
-  { title: "Reporting of Incidental Findings", portal: LANG.CKR_INCIDENTAL, paper: null },
-  { title: "Reporting of Findings in Genes with No Known Disease Association", portal: LANG.CKR_GWNKDA, paper: null },
-  { title: "Use of Sample for MCC studies for Surrogates", portal: LANG.CKR_MCC, paper: null },
+  {
+    slug: "statement-of-medical-necessity",
+    title: "Statement of Medical Necessity and Consent to Terms & Conditions for Test Order",
+    portal: LANG.CKR_SMN,
+    paper: null,
+    testCodes: "All TCs",
+    trfs: ["All"],
+  },
+  {
+    slug: "use-of-data-and-specimen",
+    title: "Use of Data and Specimen for Research Purposes",
+    portal: LANG.CKR_USE_OF_DATA,
+    paper: null,
+    testCodes: "All TCs (probands and comparators)",
+    trfs: ["All"],
+  },
+  {
+    slug: "new-york-state-residents",
+    title: "For Samples Submitted from New York State Residents",
+    portal: LANG.CKR_NYS,
+    paper: null,
+    testCodes: "All TCs (probands and comparators)",
+    trfs: ["All"],
+  },
+  {
+    slug: "acmg-secondary-findings",
+    title: "Reporting of ACMG Secondary Findings",
+    portal: LANG.CKR_ACMG,
+    paper: null,
+    testCodes: "WGS/WES (including prenatal): 1500, 1551, 1603, 1600, 1604, 1601, 1602, 1605, 1729, 1723, 1722, 1724, 1900, 1810, 1803, 1800, 1804, 1850, 1829, 1823, 1822, 1824, 1897, 60061, 8981, 60071, 1520\n\nPrenatal: 1622, 1623, 1843, 1844, 1845",
+    trfs: [
+      "Additional Affected Sibling for Trio",
+      "Adult Screening Exome",
+      "Additional Testing Req",
+      "Whole Genome Sequencing",
+      "Whole Exome Sequencing Reanalysis",
+      "Whole Exome Sequencing",
+      "Sequential Trio Whole Exome Sequencing",
+      "Prenatal Trio Whole Exome Sequencing",
+      "Prenatal WGS",
+    ],
+  },
+  {
+    slug: "incidental-findings",
+    title: "Reporting of Incidental Findings",
+    portal: LANG.CKR_INCIDENTAL,
+    paper: null,
+    testCodes: "WGS/WES: 1500, 1603, 1600, 1604, 1550, 1601, 1602, 1605, 1729, 1723, 1722, 1724, 1900, 1810, 1803, 1800, 1804, 1850, 1829, 1823, 1822, 1824, 1897, 60061, 8981, 60071, 1520",
+    trfs: [
+      "Additional Affected Sibling for Trio",
+      "Adult Screening Exome",
+      "Additional Testing Req",
+      "Whole Genome Sequencing",
+      "Whole Exome Sequencing Reanalysis",
+      "Whole Exome Sequencing",
+      "Sequential Trio Whole Exome Sequencing",
+    ],
+  },
+  {
+    slug: "genes-no-known-disease-association",
+    title: "Reporting of Findings in Genes with No Known Disease Association",
+    portal: LANG.CKR_GWNKDA,
+    paper: null,
+    testCodes: "WGS/WES trio and quad only (no prenatal): 1722, 1724, 1600, 1604, 1601, 1602, 1822, 1824, 1800, 1804",
+    trfs: [
+      "Additional Affected Sibling for Trio",
+      "Adult Screening Exome",
+      "Additional Testing Req",
+      "Whole Genome Sequencing",
+      "Whole Exome Sequencing Reanalysis",
+      "Whole Exome Sequencing",
+      "Sequential Trio Whole Exome Sequencing",
+    ],
+  },
+  {
+    slug: "mcc-studies-surrogates",
+    title: "Use of Sample for MCC studies for Surrogates",
+    portal: LANG.CKR_MCC,
+    paper: null,
+    testCodes: "Prenatal WGS/WES: 1622, 1623, 1822, 1824, 1800, 1804",
+    trfs: ["Prenatal Trio WES", "Prenatal WGS"],
+  },
 ];
 
 // Which CKR items apply to each consent category (by title)

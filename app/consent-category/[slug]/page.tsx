@@ -316,16 +316,62 @@ function SectionCardComponent({ card, visibleSections, visibleChannels, showEdit
 interface CKRCardProps {
   item: CKRItem;
   visibleSections: VisibleSections;
+  visibleChannels: Set<DistributionChannel>;
   showEdit: boolean;
 }
 
-function CKRCardComponent({ item, visibleSections, showEdit }: CKRCardProps) {
+const radioLabelStyle: React.CSSProperties = {
+  fontFamily: "var(--font-barlow), sans-serif",
+  fontWeight: 600,
+  fontSize: 16,
+  lineHeight: "24px",
+  color: "var(--text-text-primary)",
+};
+
+function RadioDisplay({ checked, label }: { checked: boolean; label: string }) {
+  return (
+    <div className="flex items-center" style={{ gap: 8 }}>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, opacity: 0.45 }}>
+        <circle cx="10" cy="10" r="9" stroke="var(--borders-border-strong)" strokeWidth="1.5" fill="var(--bg-bg-page)" />
+        {checked && (
+          <>
+            <circle cx="10" cy="10" r="9" fill="var(--text-text-primary)" stroke="var(--text-text-primary)" strokeWidth="1.5" />
+            <path d="M6 10L8.5 12.5L14 7" stroke="var(--bg-bg-page)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </>
+        )}
+      </svg>
+      <span style={{ ...bodyText, color: "var(--text-text-secondary)" }}>{label}</span>
+    </div>
+  );
+}
+
+function CKRCardComponent({ item, visibleSections, visibleChannels, showEdit }: CKRCardProps) {
+  const shownChannels = ALL_CHANNELS.filter((ch) => visibleChannels.has(ch));
+
   const consentLanguageNode = visibleSections.consentLanguage ? (
     <div className="flex flex-col" style={{ gap: 8 }}>
       <p style={sectionLabel}>Consent Language</p>
       <div className="flex flex-col">{renderLanguage(item.portal)}</div>
     </div>
   ) : null;
+
+  const responsesNode = (
+    <div className="flex flex-col" style={{ gap: 12 }}>
+      <p style={sectionLabel}>Responses</p>
+      <div className="flex items-start w-full" style={{ gap: 24 }}>
+        <div className="flex flex-col" style={{ gap: 8, flex: 1, minWidth: 0 }}>
+          <p style={radioLabelStyle}>Options &amp; Default</p>
+          <RadioDisplay checked={true} label="Opt-in" />
+          <RadioDisplay checked={false} label="Opt-out" />
+        </div>
+        <div className="flex flex-col" style={{ gap: 8, flex: 1, minWidth: 0 }}>
+          <p style={radioLabelStyle}>Data Location</p>
+          <p style={bodyText}>[Name-of-Database]</p>
+          <p style={bodyText}>[Specific Field or Column Name]</p>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="flex flex-col border border-border-subtle rounded-[4px] overflow-hidden" style={{ alignSelf: "start" }}>
@@ -348,6 +394,53 @@ function CKRCardComponent({ item, visibleSections, showEdit }: CKRCardProps) {
         </div>
 
         {consentLanguageNode && <div><Divider />{consentLanguageNode}</div>}
+        <div><Divider />{responsesNode}</div>
+
+        {(visibleSections.testCodes || visibleSections.correspondingTRFs || visibleSections.thirdPartyPlatforms) && (
+          <div>
+            <Divider />
+            <div className="flex items-start w-full" style={{ gap: 24 }}>
+              {visibleSections.testCodes && (
+                <div className="flex flex-col flex-1 min-w-0" style={{ gap: 8 }}>
+                  <p style={sectionLabel}>Test Codes</p>
+                  {item.testCodes.split("\n\n").map((block, i) => (
+                    <p key={i} style={bodyText}>{block}</p>
+                  ))}
+                </div>
+              )}
+              {(visibleSections.correspondingTRFs || visibleSections.thirdPartyPlatforms) && (
+                <div className="flex flex-col flex-1 min-w-0" style={{ gap: 16 }}>
+                  {visibleSections.correspondingTRFs && (
+                    <div className="flex flex-col" style={{ gap: 8 }}>
+                      <p style={sectionLabel}>TRFs</p>
+                      {item.trfs.map((t, i) => <p key={i} style={bodyText}>{t}</p>)}
+                    </div>
+                  )}
+                  {visibleSections.thirdPartyPlatforms && (
+                    <div className="flex flex-col" style={{ gap: 8 }}>
+                      <p style={sectionLabel}>3rd Party Platforms</p>
+                      <p style={bodyText}>None</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {visibleSections.distribution && shownChannels.length > 0 && (
+          <div>
+            <Divider />
+            <div className="flex flex-col" style={{ gap: 8 }}>
+              <p style={sectionLabel}>Published To</p>
+              <div className="flex flex-wrap" style={{ gap: "16px 24px" }}>
+                {shownChannels.map((ch) => (
+                  <DistributionRow key={ch} channel={ch} active={SHARED_DISTRIBUTION.includes(ch)} />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -612,6 +705,7 @@ export default function ConsentCategorySlugPage() {
                       key={`ckr-${i}`}
                       item={item.card}
                       visibleSections={visibleSections}
+                      visibleChannels={visibleChannels}
                       showEdit={showEdit}
                     />
                   )
