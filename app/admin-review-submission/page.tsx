@@ -67,7 +67,7 @@ function CheckboxDisplay({ label, checked }: { label: string; checked: boolean }
         {checked && (
           <div className="flex-1 h-full min-w-0 overflow-clip relative">
             <svg viewBox="0 0 20 16" fill="none" className="w-full h-full">
-              <path d="M1.5 8L7.5 14L18.5 2" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M1.5 8L7.5 14L18.5 2" stroke="var(--button-primary-btn-primary-text)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
         )}

@@ -12,11 +12,22 @@ import {
   CONSENT_CATEGORIES,
   CONSENT_SECTIONS,
   CONSENTS_WITH_RESPONSES,
+  TRF_NAMES,
   DETAIL_ROUTES,
+  type Suggestion,
+  type SuggestionType,
 } from "@/lib/search-data";
 import { getConsentMapping, testCodeMatchesFilters } from "@/lib/consent-mapping";
 
 const STATUS_OPTIONS = ["Active", "Pending", "Archived"] as const;
+
+const GROUP_LABELS: Record<SuggestionType, string> = {
+  category: "Consent Category",
+  section: "Consent Section",
+  response: "Consents with Responses",
+  "test-code": "Test Code",
+  trf: "Test Requisition Form",
+};
 
 const LABEL_STYLE: React.CSSProperties = {
   fontFamily: "var(--font-barlow), sans-serif",
@@ -81,7 +92,7 @@ function Checkbox({
       >
         {checked && (
           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-            <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )}
       </div>
@@ -184,14 +195,64 @@ function SearchPageInner() {
 
       return true;
     });
-  }, [query, categories, sections, responses, searchParams]);
+  }, [query, categories, sections, responses]);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleMouseDown(e: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
+  }, []);
+
+  function buildSuggestions(q: string): Suggestion[] {
+    const lq = q.toLowerCase().trim();
+    if (!lq) return [];
+    const results: Suggestion[] = [];
+    CONSENT_CATEGORIES.filter((c) => c.toLowerCase().includes(lq)).slice(0, 4)
+      .forEach((c) => results.push({ type: "category", label: c }));
+    CONSENT_SECTIONS.filter((c) => c.toLowerCase().includes(lq)).slice(0, 4)
+      .forEach((c) => results.push({ type: "section", label: c }));
+    CONSENTS_WITH_RESPONSES.filter((c) => c.toLowerCase().includes(lq)).slice(0, 4)
+      .forEach((c) => results.push({ type: "response", label: c }));
+    const seenCodes = new Set<string>();
+    TEST_CATALOG.filter((r) => r.testCode.toLowerCase().includes(lq) || r.testName.toLowerCase().includes(lq))
+      .filter((r) => { if (seenCodes.has(r.testCode)) return false; seenCodes.add(r.testCode); return true; })
+      .slice(0, 5)
+      .forEach((r) => results.push({ type: "test-code", label: r.testName, sublabel: r.testCode }));
+    TRF_NAMES.filter((t) => t.toLowerCase().includes(lq)).slice(0, 4)
+      .forEach((t) => results.push({ type: "trf", label: t }));
+    return results;
+  }
+
+  const suggestions = buildSuggestions(query);
+
+  function handleSuggestionClick(s: Suggestion) {
+    setDropdownOpen(false);
+    if (s.type === "test-code") {
+      const code = s.sublabel ?? s.label;
+      router.push(`/test-code-details/${encodeURIComponent(code)}`);
+      return;
+    }
+    if (s.type === "trf") {
+      router.push(`/trf-details/${encodeURIComponent(s.label)}`);
+      return;
+    }
+    const detailRoute = DETAIL_ROUTES[s.label];
+    if (detailRoute) router.push(detailRoute);
+  }
 
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = query.trim();
     if (!trimmed) return;
+    setDropdownOpen(false);
     router.replace(`/search?q=${encodeURIComponent(trimmed)}`);
   }
 
@@ -236,34 +297,94 @@ function SearchPageInner() {
               Search
             </p>
 
-            {/* Search input */}
-            <form onSubmit={handleSearchSubmit}>
-              <div
-                className="flex items-center bg-bg-page border border-border-subtle rounded-[4px]"
-                style={{ height: 40, paddingLeft: 12, paddingRight: 12, gap: 8, maxWidth: 400 }}
-              >
-                <MagnifyingGlass size={16} className="shrink-0 text-text-secondary" />
-                <input
-                  ref={inputRef}
-                  className="flex-1 min-w-0 bg-transparent outline-none"
-                  style={{
-                    fontFamily: "var(--font-barlow), sans-serif",
-                    fontWeight: 400,
-                    fontSize: 15,
-                    lineHeight: "22px",
-                    color: "var(--text-text-primary)",
-                  }}
-                  placeholder="Search by Test Code or Test Name"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-                {query && (
-                  <button type="button" onClick={() => setQuery("")} className="shrink-0">
-                    <X size={14} className="text-text-secondary" />
-                  </button>
-                )}
-              </div>
-            </form>
+            {/* Search input with typeahead */}
+            <div className="relative" style={{ maxWidth: 400 }} ref={searchContainerRef}>
+              <form onSubmit={handleSearchSubmit}>
+                <div
+                  className="flex items-center bg-bg-page border border-border-subtle rounded-[4px]"
+                  style={{ height: 40, paddingLeft: 12, paddingRight: 12, gap: 8 }}
+                >
+                  <MagnifyingGlass size={16} className="shrink-0 text-text-secondary" />
+                  <input
+                    ref={inputRef}
+                    className="flex-1 min-w-0 bg-transparent outline-none"
+                    style={{
+                      fontFamily: "var(--font-barlow), sans-serif",
+                      fontWeight: 400,
+                      fontSize: 15,
+                      lineHeight: "22px",
+                      color: "var(--text-text-primary)",
+                    }}
+                    placeholder="Search by Test Code, Consent Category or Consent Section"
+                    value={query}
+                    onChange={(e) => { setQuery(e.target.value); setDropdownOpen(e.target.value.trim().length > 0); }}
+                    onFocus={() => query.trim() && setDropdownOpen(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") setDropdownOpen(false);
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        const trimmed = query.trim();
+                        if (!trimmed) return;
+                        setDropdownOpen(false);
+                        router.replace(`/search?q=${encodeURIComponent(trimmed)}`);
+                      }
+                    }}
+                    autoComplete="off"
+                  />
+                  {query && (
+                    <button type="button" onClick={() => { setQuery(""); setDropdownOpen(false); }} className="shrink-0">
+                      <X size={14} className="text-text-secondary" />
+                    </button>
+                  )}
+                </div>
+              </form>
+
+              {dropdownOpen && suggestions.length > 0 && (
+                <div
+                  className="absolute z-20 w-full bg-bg-page border border-border-subtle rounded-[4px]"
+                  style={{ top: "calc(100% + 4px)", boxShadow: "0px 4px 12px var(--bg-ssot-shadow-dropdown)", maxHeight: 360, overflowY: "auto" }}
+                >
+                  {(["category", "section", "response", "test-code", "trf"] as SuggestionType[]).map((type) => {
+                    const group = suggestions.filter((s) => s.type === type);
+                    if (group.length === 0) return null;
+                    return (
+                      <div key={type} style={{ marginTop: 8 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px 4px" }}>
+                          <span style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 600, fontSize: 11, lineHeight: "16px", letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--text-text-secondary)", whiteSpace: "nowrap" }}>
+                            {GROUP_LABELS[type]}
+                          </span>
+                          <div style={{ flex: 1, height: 1, background: "var(--borders-border-subtle)" }} />
+                        </div>
+                        {group.map((s, i) => (
+                          <button
+                            key={i}
+                            className="flex flex-col w-full text-left hover:bg-bg-body"
+                            style={{ padding: "8px 12px" }}
+                            onMouseDown={(e) => { e.preventDefault(); handleSuggestionClick(s); }}
+                          >
+                            <span style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 400, fontSize: 14, lineHeight: "20px", color: "var(--text-text-primary)" }}>
+                              {s.type === "test-code" && s.sublabel ? `${s.sublabel} - ${s.label}` : s.label}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    );
+                  })}
+                  <div style={{ borderTop: "1px solid var(--borders-border-subtle)", marginTop: 8 }}>
+                    <button
+                      className="flex items-center w-full text-left hover:bg-bg-body"
+                      style={{ padding: "10px 12px", gap: 8 }}
+                      onMouseDown={(e) => { e.preventDefault(); setDropdownOpen(false); router.replace(`/search?q=${encodeURIComponent(query.trim())}`); }}
+                    >
+                      <MagnifyingGlass size={14} className="text-text-secondary shrink-0" />
+                      <span style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 400, fontSize: 14, lineHeight: "20px", color: "var(--text-text-secondary)" }}>
+                        Search for &ldquo;{query}&rdquo;
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Body: left panel + table */}

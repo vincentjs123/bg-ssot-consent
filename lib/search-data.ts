@@ -29,7 +29,40 @@ export type ConsentCategory = typeof CONSENT_CATEGORIES[number];
 export type ConsentSection = typeof CONSENT_SECTIONS[number];
 export type ConsentWithResponse = typeof CONSENTS_WITH_RESPONSES[number];
 
-export type SuggestionType = "category" | "section" | "response" | "test-code";
+export const TRF_NAMES = [
+  "Additional Affected Sibling for Trio",
+  "Adult Screening Exome",
+  "Additional Testing Req",
+  "Whole Genome Sequencing",
+  "Whole Exome Sequencing Reanalysis",
+  "Whole Exome Sequencing",
+  "Sequential Trio Whole Exome Sequencing",
+  "Prenatal Trio Whole Exome Sequencing - Prenatal Consent",
+  "Prenatal WGS - Prenatal Consent",
+  "Custom Family Sequencing",
+  "Custom Proband Sequencing",
+  "Autism Testing",
+  "Cytogenetics",
+  "Global MAPS",
+  "Inherited Eye Disorders",
+  "Mitochondrial",
+  "Molecular Diagnostic",
+  "NGS Panel",
+  "Total BluePrint Panel",
+  "GeneAware",
+  "Hereditary Cancer",
+  "Oncology",
+  "Cytogenetics - POC",
+  "Prenatal Comprehensive",
+  "Prenatal Chromosomal Microarray Analysis",
+  "PreSeek",
+  "Postnatal Chromosomal Microarray Analysis/Cytogenetics",
+  "Biochemical",
+] as const;
+
+export type TrfName = typeof TRF_NAMES[number];
+
+export type SuggestionType = "category" | "section" | "response" | "test-code" | "trf";
 
 export interface Suggestion {
   type: SuggestionType;
@@ -50,6 +83,9 @@ export function getTypeaheadSuggestions(query: string, maxPerGroup = 5): Suggest
 
   const resps = CONSENTS_WITH_RESPONSES.filter((c) => c.toLowerCase().includes(q)).slice(0, maxPerGroup);
   resps.forEach((c) => results.push({ type: "response", label: c }));
+
+  const trfs = TRF_NAMES.filter((t) => t.toLowerCase().includes(q)).slice(0, maxPerGroup);
+  trfs.forEach((t) => results.push({ type: "trf", label: t }));
 
   return results;
 }
@@ -76,4 +112,5 @@ export const SUGGESTION_TYPE_LABELS: Record<SuggestionType, string> = {
   section: "Consent Section",
   response: "Consents with Responses",
   "test-code": "Test Code",
+  trf: "Test Requisition Form",
 };

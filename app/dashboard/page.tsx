@@ -111,7 +111,7 @@ function CheckboxRow({
       >
         {checked && (
           <svg viewBox="0 0 20 16" fill="none" className="w-full h-full">
-            <path d="M1.5 8L7.5 14L18.5 2" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M1.5 8L7.5 14L18.5 2" stroke="var(--button-primary-btn-primary-text)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )}
       </button>
@@ -191,6 +191,10 @@ export default function Dashboard() {
   });
 
   const filteredRows = sortedRows.filter(row => {
+    if (searchValue.trim()) {
+      const q = searchValue.toLowerCase();
+      if (!row.code.toLowerCase().includes(q) && !row.name.toLowerCase().includes(q) && !row.category.toLowerCase().includes(q)) return false;
+    }
     if (filterCategory && row.category !== filterCategory) return false;
     if (filterBilling === 'Billable' && !row.billable) return false;
     if (filterBilling === 'Non-Billable' && row.billable) return false;

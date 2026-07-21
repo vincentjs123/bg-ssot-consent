@@ -10,6 +10,7 @@ import {
   CONSENT_CATEGORIES as SEARCH_CATEGORIES,
   CONSENT_SECTIONS as SEARCH_SECTIONS,
   CONSENTS_WITH_RESPONSES as SEARCH_RESPONSES,
+  TRF_NAMES,
   DETAIL_ROUTES,
   type Suggestion,
   type SuggestionType,
@@ -39,7 +40,7 @@ const CONSENT_SECTIONS: Category[] = [
     active: 5,
     pending: 1,
     description: "Explains result types — Positive, Negative, VUS — and how findings will be communicated.",
-    href: "/consent-category",
+    href: "/consent-section/test-reporting-and-results",
     connected: true,
   },
   {
@@ -277,6 +278,7 @@ const GROUP_LABELS: Record<SuggestionType, string> = {
   section: "Consent Section",
   response: "Consents with Responses",
   "test-code": "Test Code",
+  trf: "Test Requisition Form",
 };
 
 function buildSuggestions(query: string): Suggestion[] {
@@ -296,13 +298,19 @@ function buildSuggestions(query: string): Suggestion[] {
     .slice(0, 4)
     .forEach((c) => results.push({ type: "response", label: c }));
 
+  const seenCodes = new Set<string>();
   TEST_CATALOG.filter(
     (r) => r.testCode.toLowerCase().includes(q) || r.testName.toLowerCase().includes(q)
   )
+    .filter((r) => { if (seenCodes.has(r.testCode)) return false; seenCodes.add(r.testCode); return true; })
     .slice(0, 5)
     .forEach((r) =>
       results.push({ type: "test-code", label: r.testName, sublabel: r.testCode })
     );
+
+  TRF_NAMES.filter((t) => t.toLowerCase().includes(q))
+    .slice(0, 4)
+    .forEach((t) => results.push({ type: "trf", label: t }));
 
   return results;
 }
@@ -333,6 +341,15 @@ export default function ConsentsPage() {
 
   function handleSuggestionClick(s: Suggestion) {
     setDropdownOpen(false);
+    if (s.type === "test-code") {
+      const code = s.sublabel ?? s.label;
+      router.push(`/test-code-details/${encodeURIComponent(code)}`);
+      return;
+    }
+    if (s.type === "trf") {
+      router.push(`/trf-details/${encodeURIComponent(s.label)}`);
+      return;
+    }
     const detailRoute = DETAIL_ROUTES[s.label];
     if (detailRoute) router.push(detailRoute);
   }
@@ -345,18 +362,9 @@ export default function ConsentsPage() {
     router.push(`/search?q=${encodeURIComponent(trimmed)}`);
   }
 
-  const q = search.toLowerCase();
-
-  function filterCards(list: Category[]) {
-    if (!q) return list;
-    return list.filter(
-      (c) => c.name.toLowerCase().includes(q) || c.description.toLowerCase().includes(q)
-    );
-  }
-
-  const filteredSections = filterCards(CONSENT_SECTIONS);
-  const filteredAdditional = filterCards(ADDITIONAL_CONSENT_REPORTING);
-  const filteredCategories = filterCards(CONSENT_CATEGORIES);
+  const visibleSections = CONSENT_SECTIONS;
+  const visibleAdditional = ADDITIONAL_CONSENT_REPORTING;
+  const visibleCategories = CONSENT_CATEGORIES;
 
   const showSections = browseFilter === "all" || browseFilter === "consent-sections";
   const showAdditional = browseFilter === "all" || browseFilter === "consents-with-responses";
@@ -366,9 +374,9 @@ export default function ConsentsPage() {
     browseFilter === "consents-with-responses" ? "Consents with Responses" : "Additional Consent Reporting";
 
   const hasResults =
-    (showSections && filteredSections.length > 0) ||
-    (showAdditional && filteredAdditional.length > 0) ||
-    (showCategories && filteredCategories.length > 0);
+    (showSections && visibleSections.length > 0) ||
+    (showAdditional && visibleAdditional.length > 0) ||
+    (showCategories && visibleCategories.length > 0);
 
   return (
     <div className="flex flex-col min-h-screen bg-bg-page">
@@ -447,7 +455,7 @@ export default function ConsentsPage() {
                     overflowY: "auto",
                   }}
                 >
-                  {(["category", "section", "response", "test-code"] as SuggestionType[]).map((type) => {
+                  {(["category", "section", "response", "test-code", "trf"] as SuggestionType[]).map((type) => {
                     const group = suggestions.filter((s) => s.type === type);
                     if (group.length === 0) return null;
                     return (
@@ -568,7 +576,7 @@ export default function ConsentsPage() {
                   <option value="all">All</option>
                   <option value="consent-categories">Consent Categories</option>
                   <option value="consent-sections">Consent Sections</option>
-                  <option value="consents-with-responses">Additional Consent Reporting</option>
+                  <option value="consents-with-responses">Consents with Responses</option>
                 </select>
                 <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
                   <CaretDown size={14} className="text-text-secondary" />
@@ -582,9 +590,9 @@ export default function ConsentsPage() {
             {/* Card sections */}
             {hasResults ? (
               <div className="flex flex-col w-full" style={{ gap: 32 }}>
-                {showCategories && <Section label="Consent Categories" items={filteredCategories} />}
-                {showSections && <Section label="Consent Sections" items={filteredSections} />}
-                {showAdditional && <Section label={additionalLabel} items={filteredAdditional} />}
+                {showCategories && <Section label="Consent Categories" items={visibleCategories} />}
+                {showSections && <Section label="Consent Sections" items={visibleSections} />}
+                {showAdditional && <Section label={additionalLabel} items={visibleAdditional} />}
               </div>
             ) : (
               <div className="flex items-center justify-center w-full" style={{ paddingTop: 60, paddingBottom: 60 }}>

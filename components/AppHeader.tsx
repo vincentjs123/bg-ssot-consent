@@ -159,7 +159,7 @@ export default function AppHeader({ domain, activeTab, showCreateConsent = false
                 {MENU_ITEMS.map((item) => (
                   <Link
                     key={item.label}
-                    href="/"
+                    href={DOMAIN_CONFIG[item.id].href}
                     onClick={() => setMenuOpen(false)}
                     className="flex items-center w-full hover:bg-bg-body"
                     style={{

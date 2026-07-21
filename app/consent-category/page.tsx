@@ -300,7 +300,7 @@ function ActionsMenu({ showEdit }: { showEdit: boolean }) {
             position: "absolute",
             top: "calc(100% + 4px)",
             right: 0,
-            background: "white",
+            background: "var(--bg-bg-page)",
             border: "1px solid var(--borders-border-subtle)",
             borderRadius: 4,
             boxShadow: "0px 4px 12px var(--bg-ssot-shadow-dropdown)",
@@ -526,7 +526,7 @@ function CheckRow({ label, checked, onChange }: { label: string; checked: boolea
       >
         {checked && (
           <svg viewBox="0 0 20 16" fill="none" style={{ width: "100%", height: "100%" }}>
-            <path d="M1.5 8L7.5 14L18.5 2" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M1.5 8L7.5 14L18.5 2" stroke="var(--button-primary-btn-primary-text)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )}
       </div>
@@ -568,7 +568,7 @@ function CustomizeViewPanel({ visibleConsents, setVisibleConsents, visibleConsen
     <div
       style={{
         width: "100%",
-        background: "white",
+        background: "var(--bg-bg-page)",
         border: "1px solid var(--borders-border-subtle)",
         borderRadius: 4,
         padding: 24,
@@ -624,7 +624,7 @@ function CustomizeViewPanel({ visibleConsents, setVisibleConsents, visibleConsen
         <button
           onClick={onReset}
           className="flex items-center justify-center rounded-[4px]"
-          style={{ height: 36, paddingLeft: 16, paddingRight: 16, border: "1px solid var(--text-text-primary)", background: "white" }}
+          style={{ height: 36, paddingLeft: 16, paddingRight: 16, border: "1px solid var(--text-text-primary)", background: "var(--bg-bg-page)" }}
         >
           <span style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 500, fontSize: 16, lineHeight: "24px", color: "var(--text-text-primary)" }}>
             Reset All

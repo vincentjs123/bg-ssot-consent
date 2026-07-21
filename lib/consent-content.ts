@@ -164,6 +164,12 @@ export const SECTION_META: Record<string, SectionPageMeta> = {
     chip: "Consent Section",
     description: "Patient’s acknowledgment of financial responsibility and billing terms.",
   },
+  "test-reporting-and-results": {
+    name: "Test Reporting and Results",
+    slug: "test-reporting-and-results",
+    chip: "Consent Section",
+    description: "Explains result types — Positive, Negative, VUS — and how findings will be communicated.",
+  },
 };
 
 // ─── Category metadata ─────────────────────────────────────────────────────────
