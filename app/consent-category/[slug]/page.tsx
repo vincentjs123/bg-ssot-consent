@@ -417,18 +417,19 @@ interface CustomizeViewProps {
   setVisibleChannels: (v: Set<DistributionChannel>) => void;
   visibleStatuses: Set<StatusFilter>;
   setVisibleStatuses: (v: Set<StatusFilter>) => void;
+  activeStatuses: Set<StatusFilter>;
   onClose: () => void;
   onReset: () => void;
 }
 
-function CheckRow({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
+function CheckRow({ label, checked, onChange, disabled }: { label: string; checked: boolean; onChange: () => void; disabled?: boolean }) {
   return (
-    <button className="flex items-start text-left w-full" style={{ gap: 12 }} onClick={onChange}>
+    <button className="flex items-start text-left w-full" style={{ gap: 12, cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.38 : 1 }} onClick={() => !disabled && onChange()}>
       <div
         className="shrink-0 rounded-[2px] flex items-center justify-center"
-        style={{ width: 24, height: 24, marginTop: 0, backgroundColor: checked ? "var(--button-primary-btn-primary-bg)" : "transparent", border: checked ? "none" : "1px solid var(--borders-border-strong)", padding: checked ? 2 : 0 }}
+        style={{ width: 24, height: 24, marginTop: 0, backgroundColor: checked && !disabled ? "var(--button-primary-btn-primary-bg)" : "transparent", border: checked && !disabled ? "none" : "1px solid var(--borders-border-strong)", padding: checked && !disabled ? 2 : 0 }}
       >
-        {checked && (
+        {checked && !disabled && (
           <svg viewBox="0 0 20 16" fill="none" style={{ width: "100%", height: "100%" }}>
             <path d="M1.5 8L7.5 14L18.5 2" stroke="var(--button-primary-btn-primary-text)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -461,6 +462,7 @@ function CustomizeViewPanel({
   visibleSections, setVisibleSections,
   visibleChannels, setVisibleChannels,
   visibleStatuses, setVisibleStatuses,
+  activeStatuses,
   onClose, onReset,
 }: CustomizeViewProps) {
   function toggle<T extends string>(set: Set<T>, setFn: (v: Set<T>) => void, val: T) {
@@ -502,7 +504,7 @@ function CustomizeViewPanel({
 
       <PanelColumn title="Status">
         {STATUS_OPTIONS.map(({ value, label }) => (
-          <CheckRow key={value} label={label} checked={visibleStatuses.has(value)} onChange={() => toggle(visibleStatuses, setVisibleStatuses, value)} />
+          <CheckRow key={value} label={label} checked={visibleStatuses.has(value)} onChange={() => toggle(visibleStatuses, setVisibleStatuses, value)} disabled={!activeStatuses.has(value)} />
         ))}
       </PanelColumn>
 
@@ -633,6 +635,7 @@ export default function ConsentCategorySlugPage() {
                   setVisibleChannels={setVisibleChannels}
                   visibleStatuses={visibleStatuses}
                   setVisibleStatuses={setVisibleStatuses}
+                  activeStatuses={new Set<StatusFilter>(["Live"])}
                   onClose={() => setCustomizeOpen(false)}
                   onReset={() => {
                     setVisibleSectionCards(new Set(sectionNames));

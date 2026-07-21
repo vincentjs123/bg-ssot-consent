@@ -17,7 +17,7 @@ import {
   type Suggestion,
   type SuggestionType,
 } from "@/lib/search-data";
-import { testCodeMatchesFilters } from "@/lib/consent-mapping";
+import { testCodeMatchesFilters, getConsentMapping } from "@/lib/consent-mapping";
 import { TEST_CODE_CONSENTS } from "@/lib/consent-content";
 
 const STATUS_OPTIONS = ["Active", "Pending", "Archived"] as const;
@@ -73,25 +73,27 @@ function Checkbox({
   checked,
   onChange,
   label,
+  disabled,
 }: {
   checked: boolean;
   onChange: (v: boolean) => void;
   label: string;
+  disabled?: boolean;
 }) {
   return (
-    <label className="flex items-start cursor-pointer" style={{ gap: 8 }}>
+    <label className="flex items-start" style={{ gap: 8, cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.38 : 1 }}>
       <div
         className="shrink-0 flex items-center justify-center rounded-[2px]"
         style={{
           width: 16,
           height: 16,
           marginTop: 2,
-          background: checked ? "var(--text-text-primary)" : "transparent",
-          border: checked ? "1px solid var(--text-text-primary)" : "1px solid var(--borders-border-strong)",
+          background: checked && !disabled ? "var(--text-text-primary)" : "transparent",
+          border: checked && !disabled ? "1px solid var(--text-text-primary)" : "1px solid var(--borders-border-strong)",
         }}
-        onClick={() => onChange(!checked)}
+        onClick={() => !disabled && onChange(!checked)}
       >
-        {checked && (
+        {checked && !disabled && (
           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
             <path d="M1 4L3.5 6.5L9 1" stroke="var(--button-primary-btn-primary-text)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -199,6 +201,20 @@ function SearchPageInner() {
       return true;
     });
   }, [committedQuery, categories, sections, responses]);
+
+  // Per-category result counts ignoring the category filter, used to disable inactive checkboxes
+  const categoryCounts = useMemo(() => {
+    const q = committedQuery.trim().toLowerCase();
+    const counts: Record<string, number> = Object.fromEntries(CONSENT_CATEGORIES.map((c) => [c, 0]));
+    const allCatsTrue = Object.fromEntries(CONSENT_CATEGORIES.map((c) => [c, true]));
+    TEST_CATALOG.forEach((row) => {
+      if (q && !(row.testCode.toLowerCase().includes(q) || row.testName.toLowerCase().includes(q))) return;
+      if (!testCodeMatchesFilters(row.testCode, allCatsTrue, sections, responses)) return;
+      const cat = getConsentMapping(row.testCode).category;
+      if (cat && counts[cat] !== undefined) counts[cat]++;
+    });
+    return counts;
+  }, [committedQuery, sections, responses]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -443,6 +459,7 @@ function SearchPageInner() {
                       checked={categories[c]}
                       onChange={(v) => setCategories((prev) => ({ ...prev, [c]: v }))}
                       label={c}
+                      disabled={categoryCounts[c] === 0}
                     />
                   ))}
                 </FilterSection>

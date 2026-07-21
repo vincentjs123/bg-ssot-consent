@@ -11,6 +11,7 @@ import {
   SECTION_META,
   SECTION_CARDS,
   LOREM_GAP,
+  CKR_FOR_CONSENT,
   type SectionCard as ContentSectionCard,
 } from "@/lib/consent-content";
 
@@ -343,18 +344,20 @@ interface CustomizeViewProps {
   setVisibleChannels: (v: Set<DistributionChannel>) => void;
   visibleStatuses: Set<StatusFilter>;
   setVisibleStatuses: (v: Set<StatusFilter>) => void;
+  activeStatuses: Set<StatusFilter>;
+  activeCWRTitles: Set<string>;
   onClose: () => void;
   onReset: () => void;
 }
 
-function CheckRow({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
+function CheckRow({ label, checked, onChange, disabled }: { label: string; checked: boolean; onChange: () => void; disabled?: boolean }) {
   return (
-    <button className="flex items-start text-left w-full" style={{ gap: 12 }} onClick={onChange}>
+    <button className="flex items-start text-left w-full" style={{ gap: 12, cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.38 : 1 }} onClick={() => !disabled && onChange()}>
       <div
         className="shrink-0 rounded-[2px] flex items-center justify-center"
-        style={{ width: 24, height: 24, marginTop: 0, backgroundColor: checked ? "var(--button-primary-btn-primary-bg)" : "transparent", border: checked ? "none" : "1px solid var(--borders-border-strong)", padding: checked ? 2 : 0 }}
+        style={{ width: 24, height: 24, marginTop: 0, backgroundColor: checked && !disabled ? "var(--button-primary-btn-primary-bg)" : "transparent", border: checked && !disabled ? "none" : "1px solid var(--borders-border-strong)", padding: checked && !disabled ? 2 : 0 }}
       >
-        {checked && (
+        {checked && !disabled && (
           <svg viewBox="0 0 20 16" fill="none" style={{ width: "100%", height: "100%" }}>
             <path d="M1.5 8L7.5 14L18.5 2" stroke="var(--button-primary-btn-primary-text)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -385,6 +388,7 @@ function CustomizeViewPanel({
   visibleSections, setVisibleSections,
   visibleChannels, setVisibleChannels,
   visibleStatuses, setVisibleStatuses,
+  activeStatuses, activeCWRTitles,
   onClose, onReset,
 }: CustomizeViewProps) {
   function toggle<T extends string>(set: Set<T>, setFn: (v: Set<T>) => void, val: T) {
@@ -414,7 +418,7 @@ function CustomizeViewPanel({
 
       <PanelColumn title="Consents with Responses">
         {CONSENTS_WITH_RESPONSES_LIST.map((name) => (
-          <CheckRow key={name} label={name} checked={visibleConsentsWithResponses.has(name)} onChange={() => toggle(visibleConsentsWithResponses, setVisibleConsentsWithResponses, name)} />
+          <CheckRow key={name} label={name} checked={visibleConsentsWithResponses.has(name)} onChange={() => toggle(visibleConsentsWithResponses, setVisibleConsentsWithResponses, name)} disabled={!activeCWRTitles.has(name)} />
         ))}
       </PanelColumn>
 
@@ -426,7 +430,7 @@ function CustomizeViewPanel({
 
       <PanelColumn title="Status">
         {STATUS_OPTIONS.map(({ value, label }) => (
-          <CheckRow key={value} label={label} checked={visibleStatuses.has(value)} onChange={() => toggle(visibleStatuses, setVisibleStatuses, value)} />
+          <CheckRow key={value} label={label} checked={visibleStatuses.has(value)} onChange={() => toggle(visibleStatuses, setVisibleStatuses, value)} disabled={!activeStatuses.has(value)} />
         ))}
       </PanelColumn>
 
@@ -454,6 +458,12 @@ export default function ConsentSectionSlugPage() {
   const meta = SECTION_META[slug];
   const cards = SECTION_CARDS[slug] ?? [];
   const allConsentNames = cards.map((c) => c.consentName);
+
+  // CWR titles applicable to any consent on this section page
+  const activeCWRTitles = new Set(
+    cards.flatMap((c) => CKR_FOR_CONSENT[c.consentSlug] ?? [])
+  );
+  const activeStatuses = new Set<StatusFilter>(["Live"]);
 
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const [visibleConsents, setVisibleConsents] = useState<Set<string>>(new Set(allConsentNames));
@@ -545,6 +555,8 @@ export default function ConsentSectionSlugPage() {
                   setVisibleChannels={setVisibleChannels}
                   visibleStatuses={visibleStatuses}
                   setVisibleStatuses={setVisibleStatuses}
+                  activeStatuses={activeStatuses}
+                  activeCWRTitles={activeCWRTitles}
                   onClose={() => setCustomizeOpen(false)}
                   onReset={() => {
                     setVisibleConsents(new Set(allConsentNames));
