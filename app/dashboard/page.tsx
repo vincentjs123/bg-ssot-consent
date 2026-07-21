@@ -19,8 +19,10 @@ import {
   ArrowsDownUp,
 } from "@phosphor-icons/react";
 import AppHeader from "@/components/AppHeader";
+import { TEST_CODE_CONSENTS } from "@/lib/consent-content";
 
 const MOCK_ROWS = [
+  { code: "1610", name: "Proband Whole Genome Sequencing", category: "WGS", cpt: "81425", price: "$ 6,000.00", billable: true, nyApproval: true },
   { code: "2010", name: "Advanced mtDNA Point Mutations and Deletions by Massively Parallel Sequencing", category: "Mito", cpt: "81228x1, 89398", price: "$ 450.00", billable: true, nyApproval: true },
   { code: "1100", name: "Whole Genome Sequencing [Placeholder]", category: "WGS", cpt: "81425", price: "$ 6,000.00", billable: true, nyApproval: false },
   { code: "3200", name: "Hereditary Breast and Ovarian Cancer Panel [Placeholder]", category: "NGS", cpt: "81432, 81433", price: "$ 2,800.00", billable: true, nyApproval: true },
@@ -532,7 +534,7 @@ export default function Dashboard() {
                 >
                   <div className="flex items-center min-w-0" style={{ flex: 1, paddingLeft: 8, paddingRight: 8 }}>
                     <Link
-                      href="/test-code-details"
+                      href={TEST_CODE_CONSENTS[row.code] ? `/test-code/${row.code}` : "/test-code-details"}
                       className="overflow-hidden text-ellipsis whitespace-nowrap text-text-primary hover:underline"
                       style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 400, fontSize: 16, lineHeight: "24px" }}
                     >
@@ -570,7 +572,7 @@ export default function Dashboard() {
                     </button>
                     {actionsOpen === i && (
                       <div style={{ ...overlayStyle, padding: 20, minWidth: 180, right: 0, left: "auto", display: "flex", flexDirection: "column", gap: 16 }}>
-                        <Link href="/test-code-details" style={menuLinkStyle} onClick={closeAll}>View Details</Link>
+                        <Link href={TEST_CODE_CONSENTS[row.code] ? `/test-code/${row.code}` : "/test-code-details"} style={menuLinkStyle} onClick={closeAll}>View Details</Link>
                         {canEdit(role) && <Link href="/request-edit" style={menuLinkStyle} onClick={closeAll}>Request Edit</Link>}
                         {canEdit(role) && <Link href="/request-delete" style={menuLinkStyle} onClick={closeAll}>Request Delete</Link>}
                         <span style={{ ...menuLinkStyle, cursor: "default" }}>Export Details</span>

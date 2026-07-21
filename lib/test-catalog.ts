@@ -7,6 +7,7 @@ export interface TestRecord {
 }
 
 export const TEST_CATALOG: TestRecord[] = [
+  { testCode: "1610", testName: "Proband Whole Genome Sequencing", medicalApplication: "Germline Testing", testingType: "Whole Genome Sequencing" },
   { testCode: "1522", testName: "Custom Sequence Analysis - Prenatal", medicalApplication: "Confirmation Testing", testingType: "Diagnostic Testing" },
   { testCode: "1560", testName: "Custom Proband Sequence Analysis (Familial Mutation/Variant Analysis)", medicalApplication: "Confirmation Testing", testingType: "Diagnostic Testing" },
   { testCode: "1580", testName: "Custom Family Sequence Analysis (Familial Mutation/Variant Analysis)", medicalApplication: "Confirmation Testing", testingType: "Diagnostic Testing" },

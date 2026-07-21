@@ -546,6 +546,17 @@ export const CKR_ITEMS: CKRItem[] = [
 ];
 
 // Which CKR items apply to each consent category (by title)
+// Maps test code → consent category slug (determines which cards appear on the test code detail page)
+export const TEST_CODE_CONSENTS: Record<string, string> = {
+  ...Object.fromEntries(
+    WGS_CODES.split(", ").map((c) => [c.trim(), "informed-consent-for-wes-and-wgs"])
+  ),
+  ...Object.fromEntries(
+    PRENATAL_CODES.split(", ").map((c) => [c.trim(), "prenatal-wgs-wes-consent"])
+  ),
+  "1610": "informed-consent-for-wes-and-wgs",
+};
+
 export const CKR_FOR_CONSENT: Record<string, string[]> = {
   "informed-consent-for-wes-and-wgs": [
     "Statement of Medical Necessity and Consent to Terms & Conditions for Test Order",
