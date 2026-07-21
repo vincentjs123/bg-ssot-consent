@@ -371,7 +371,7 @@ export default function ConsentsPage() {
   const showCategories = browseFilter === "all" || browseFilter === "consent-categories";
 
   const additionalLabel =
-    browseFilter === "consents-with-responses" ? "Consents with Responses" : "Additional Consent Reporting";
+    browseFilter === "consents-with-responses" ? "Consents with Responses" : "Consents with Responses";
 
   const hasResults =
     (showSections && visibleSections.length > 0) ||
