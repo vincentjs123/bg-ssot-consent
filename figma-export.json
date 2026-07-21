@@ -1,0 +1,20 @@
+{
+  "figmaFile": "b06D8PhSu51B1kaeXYtxMB",
+  "baseUrl": "http://localhost:3000",
+  "screens": [
+    {
+      "name": "Consents Homepage",
+      "url": "/consents",
+      "viewport": { "width": 1440, "height": 900 },
+      "fullPage": true,
+      "states": [
+        {
+          "label": "Administrator",
+          "setup": {
+            "localStorage": { "bg_selected_role": "administrator" }
+          }
+        }
+      ]
+    }
+  ]
+}

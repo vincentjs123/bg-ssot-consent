@@ -1,0 +1,27 @@
+{
+  "session": {
+    "id": "20260701T082634",
+    "timestamp": "2026-07-01T12:26:37.736Z",
+    "baseUrl": "http://localhost:3000",
+    "figmaFile": "b06D8PhSu51B1kaeXYtxMB",
+    "outputDir": "/Users/vsanto/ai-projects/bg-ssot-consent/exports/20260701T082634"
+  },
+  "componentMap": {},
+  "screens": [
+    {
+      "id": "consents-homepage-administrator",
+      "label": "Consents Homepage — Administrator",
+      "index": 1,
+      "url": "http://localhost:3000/consents",
+      "screenshotPath": "/Users/vsanto/ai-projects/bg-ssot-consent/exports/20260701T082634/consents-homepage-administrator.png",
+      "filename": "consents-homepage-administrator.png",
+      "width": 1440,
+      "height": 1438,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "error": null
+    }
+  ]
+}

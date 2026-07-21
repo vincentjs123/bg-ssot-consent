@@ -1,0 +1,29 @@
+/**
+ * tokens.project.css — Project-specific CSS custom properties.
+ *
+ * This file is NEVER overwritten by `npm run tokens:sync`.
+ * Add any values not covered by the design system here.
+ *
+ * Naming convention: --[project-abbreviation]-[category]-[variant]
+ *   e.g. --lmn-confidence-high, --dash-status-active
+ *
+ * Keep this file in sync with the design system by checking whether
+ * a new design token was added that supersedes a value here.
+ */
+
+:root {
+  /* Prototype gap indicator — red italic text, no DS equivalent */
+  --bg-ssot-gap-indicator: #cc0000;
+
+  /* Form validation error */
+  --bg-ssot-form-error: #C0392B;
+
+  /* Toast / confirmation banner backgrounds */
+  --bg-ssot-toast-success: #2A7E52;
+  --bg-ssot-toast-warning: #8B4513;
+
+  /* Drop-shadow values used in floating panels and dropdowns */
+  --bg-ssot-shadow-dropdown: rgba(0, 0, 0, 0.12);
+  --bg-ssot-shadow-hover: rgba(0, 0, 0, 0.10);
+  --bg-ssot-shadow-header: rgba(0, 0, 0, 0.08);
+}
