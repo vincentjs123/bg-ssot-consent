@@ -101,7 +101,7 @@ function AdminStatusQueueInner() {
           className="flex items-center w-full"
           style={{
             background: toast.type === "success" ? "var(--bg-ssot-toast-success)" : "var(--bg-ssot-toast-warning)",
-            color: "white", padding: "12px 64px", gap: 12, marginTop: 12,
+            color: "var(--button-primary-btn-primary-text)", padding: "12px 64px", gap: 12, marginTop: 12,
           }}
         >
           {toast.type === "success"

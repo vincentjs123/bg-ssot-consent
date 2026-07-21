@@ -11,7 +11,7 @@ export default function TestCodeDetailPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg-page">
-      <AppHeader domain="consents" activeTab="consents" />
+      <AppHeader domain="test-codes" activeTab="test-codes" />
 
       <main className="flex flex-col w-full max-w-[1280px] mx-auto" style={{ padding: "32px 64px 64px", gap: 32 }}>
         <Link

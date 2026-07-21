@@ -163,7 +163,7 @@ const statusChipStyle = (status: CardStatus): React.CSSProperties => ({
   paddingBottom: 4,
   whiteSpace: "nowrap",
   background: status === "Live" ? "var(--button-success-btn-success-bg)" : "var(--button-caution-btn-caution-bg)",
-  color: status === "Live" ? "white" : "var(--text-text-primary)",
+  color: status === "Live" ? "var(--button-primary-btn-primary-text)" : "var(--text-text-primary)",
 });
 
 // ─── Actions Menu ─────────────────────────────────────────────────────────────
@@ -288,7 +288,7 @@ function ConsentCardComponent({ card, visibleSections, visibleChannels, showEdit
     <div className="flex flex-col border border-border-subtle rounded-[4px] overflow-hidden" style={{ alignSelf: "start" }}>
       <div style={{ background: "var(--deepblue-color-primary-500)", padding: "8px 12px", minHeight: 88, display: "flex", alignItems: "center" }}>
         <Link href={`/consent-category/${card.consentSlug}`} style={{ textDecoration: "none" }}>
-          <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 28, lineHeight: "36px", letterSpacing: "-0.14px", color: "white", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+          <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 28, lineHeight: "36px", letterSpacing: "-0.14px", color: "var(--button-primary-btn-primary-text)", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
             {card.consentName}
           </p>
         </Link>

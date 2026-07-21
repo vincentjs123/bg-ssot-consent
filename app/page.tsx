@@ -336,7 +336,7 @@ export default function RoleSelection() {
               fontWeight: 500,
               fontSize: 16,
               lineHeight: "20px",
-              color: "white",
+              color: "var(--button-primary-btn-primary-text)",
             }}
           >
             Continue

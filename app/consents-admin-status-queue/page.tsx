@@ -88,7 +88,7 @@ function ConsentsAdminStatusQueueInner() {
       <AppHeader domain="consents" activeTab="status-queue" />
 
       {toast && (
-        <div className="flex items-center w-full" style={{ background: toast.type === "success" ? "var(--bg-ssot-toast-success)" : "var(--bg-ssot-toast-warning)", color: "white", padding: "12px 64px", gap: 12, marginTop: 12 }}>
+        <div className="flex items-center w-full" style={{ background: toast.type === "success" ? "var(--bg-ssot-toast-success)" : "var(--bg-ssot-toast-warning)", color: "var(--button-primary-btn-primary-text)", padding: "12px 64px", gap: 12, marginTop: 12 }}>
           {toast.type === "success" ? <CheckCircle size={20} weight="fill" className="shrink-0" /> : <Warning size={20} weight="fill" className="shrink-0" />}
           <span style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 400, fontSize: 16, lineHeight: "24px", flex: 1 }}>{toast.text}</span>
           <button onClick={() => setToast(null)} className="shrink-0"><X size={20} /></button>

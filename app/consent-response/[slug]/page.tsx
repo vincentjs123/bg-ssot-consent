@@ -141,7 +141,7 @@ function CKRDetail({ item }: { item: CKRItem }) {
   return (
     <div className="flex flex-col border border-border-subtle rounded-[4px] overflow-hidden" style={{ alignSelf: "start" }}>
       <div style={{ background: "var(--button-secondary-btn-secondary-bg-active)", padding: "8px 12px", minHeight: 88, display: "flex", alignItems: "center" }}>
-        <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 28, lineHeight: "36px", letterSpacing: "-0.14px", color: "white" }}>
+        <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 28, lineHeight: "36px", letterSpacing: "-0.14px", color: "var(--button-primary-btn-primary-text)" }}>
           {item.title}
         </p>
       </div>
@@ -164,7 +164,7 @@ function CKRDetail({ item }: { item: CKRItem }) {
               paddingBottom: 4,
               whiteSpace: "nowrap",
               background: "var(--button-success-btn-success-bg)",
-              color: "white",
+              color: "var(--button-primary-btn-primary-text)",
             }}>Live</span>
             <span style={{ ...bodyText, fontSize: 14, whiteSpace: "pre" }}>Version 2.0  |  TBD</span>
           </div>
@@ -185,8 +185,14 @@ function CKRDetail({ item }: { item: CKRItem }) {
             <div className="flex items-start w-full" style={{ gap: 24 }}>
               <div className="flex flex-col" style={{ gap: 8, flex: 1, minWidth: 0 }}>
                 <p style={radioLabelStyle}>Options &amp; Default</p>
-                <RadioDisplay checked={true} label="Opt-in" />
-                <RadioDisplay checked={false} label="Opt-out" />
+                {item.defaultResponse === "required" ? (
+                  <p style={bodyText}>Required (no opt-in/opt-out)</p>
+                ) : (
+                  <>
+                    <RadioDisplay checked={item.defaultResponse === "opt-in"} label="Opt-in" />
+                    <RadioDisplay checked={item.defaultResponse === "opt-out"} label="Opt-out" />
+                  </>
+                )}
               </div>
               <div className="flex flex-col" style={{ gap: 8, flex: 1, minWidth: 0 }}>
                 <p style={radioLabelStyle}>Data Location</p>

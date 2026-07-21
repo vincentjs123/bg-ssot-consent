@@ -263,7 +263,7 @@ const statusChipStyle = (status: CardStatus): React.CSSProperties => ({
   paddingBottom: 4,
   whiteSpace: "nowrap",
   background: status === "Live" ? "var(--button-success-btn-success-bg)" : "var(--button-caution-btn-caution-bg)",
-  color: status === "Live" ? "white" : "var(--text-text-primary)",
+  color: status === "Live" ? "var(--button-primary-btn-primary-text)" : "var(--text-text-primary)",
 });
 
 // ─── Actions Menu ─────────────────────────────────────────────────────────────
@@ -394,7 +394,7 @@ function ConsentCardComponent({ card, visibleSections, visibleChannels, showEdit
               fontSize: 28,
               lineHeight: "36px",
               letterSpacing: "-0.14px",
-              color: "white",
+              color: "var(--button-primary-btn-primary-text)",
               overflow: "hidden",
               display: "-webkit-box",
               WebkitLineClamp: 2,
@@ -410,7 +410,7 @@ function ConsentCardComponent({ card, visibleSections, visibleChannels, showEdit
             fontSize: 28,
             lineHeight: "36px",
             letterSpacing: "-0.14px",
-            color: "white",
+            color: "var(--button-primary-btn-primary-text)",
             overflow: "hidden",
             display: "-webkit-box",
             WebkitLineClamp: 2,

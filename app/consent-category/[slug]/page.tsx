@@ -159,7 +159,7 @@ const statusChipStyle = (status: CardStatus): React.CSSProperties => ({
   paddingBottom: 4,
   whiteSpace: "nowrap",
   background: status === "Live" ? "var(--button-success-btn-success-bg)" : "var(--button-caution-btn-caution-bg)",
-  color: status === "Live" ? "white" : "var(--text-text-primary)",
+  color: status === "Live" ? "var(--button-primary-btn-primary-text)" : "var(--text-text-primary)",
 });
 
 // ─── Actions Menu ─────────────────────────────────────────────────────────────
@@ -271,7 +271,7 @@ function SectionCardComponent({ card, visibleSections, visibleChannels, showEdit
   return (
     <div className="flex flex-col border border-border-subtle rounded-[4px] overflow-hidden" style={{ alignSelf: "start" }}>
       <div style={{ background: "var(--deepblue-color-primary-500)", padding: "8px 12px", minHeight: 88, display: "flex", alignItems: "center" }}>
-        <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 28, lineHeight: "36px", letterSpacing: "-0.14px", color: "white", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+        <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 28, lineHeight: "36px", letterSpacing: "-0.14px", color: "var(--button-primary-btn-primary-text)", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
           {card.sectionName}
         </p>
       </div>
@@ -320,31 +320,6 @@ interface CKRCardProps {
   showEdit: boolean;
 }
 
-const radioLabelStyle: React.CSSProperties = {
-  fontFamily: "var(--font-barlow), sans-serif",
-  fontWeight: 600,
-  fontSize: 16,
-  lineHeight: "24px",
-  color: "var(--text-text-primary)",
-};
-
-function RadioDisplay({ checked, label }: { checked: boolean; label: string }) {
-  return (
-    <div className="flex items-center" style={{ gap: 8 }}>
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, opacity: 0.45 }}>
-        <circle cx="10" cy="10" r="9" stroke="var(--borders-border-strong)" strokeWidth="1.5" fill="var(--bg-bg-page)" />
-        {checked && (
-          <>
-            <circle cx="10" cy="10" r="9" fill="var(--text-text-primary)" stroke="var(--text-text-primary)" strokeWidth="1.5" />
-            <path d="M6 10L8.5 12.5L14 7" stroke="var(--bg-bg-page)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </>
-        )}
-      </svg>
-      <span style={{ ...bodyText, color: "var(--text-text-secondary)" }}>{label}</span>
-    </div>
-  );
-}
-
 function CKRCardComponent({ item, visibleSections, visibleChannels, showEdit }: CKRCardProps) {
   const shownChannels = ALL_CHANNELS.filter((ch) => visibleChannels.has(ch));
 
@@ -355,28 +330,10 @@ function CKRCardComponent({ item, visibleSections, visibleChannels, showEdit }: 
     </div>
   ) : null;
 
-  const responsesNode = (
-    <div className="flex flex-col" style={{ gap: 12 }}>
-      <p style={sectionLabel}>Responses</p>
-      <div className="flex items-start w-full" style={{ gap: 24 }}>
-        <div className="flex flex-col" style={{ gap: 8, flex: 1, minWidth: 0 }}>
-          <p style={radioLabelStyle}>Options &amp; Default</p>
-          <RadioDisplay checked={true} label="Opt-in" />
-          <RadioDisplay checked={false} label="Opt-out" />
-        </div>
-        <div className="flex flex-col" style={{ gap: 8, flex: 1, minWidth: 0 }}>
-          <p style={radioLabelStyle}>Data Location</p>
-          <p style={bodyText}>[Name-of-Database]</p>
-          <p style={bodyText}>[Specific Field or Column Name]</p>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="flex flex-col border border-border-subtle rounded-[4px] overflow-hidden" style={{ alignSelf: "start" }}>
       <div style={{ background: `var(--button-secondary-btn-secondary-bg-active)`, padding: "8px 12px", minHeight: 88, display: "flex", alignItems: "center" }}>
-        <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 28, lineHeight: "36px", letterSpacing: "-0.14px", color: "white", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+        <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 28, lineHeight: "36px", letterSpacing: "-0.14px", color: "var(--button-primary-btn-primary-text)", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
           {item.title}
         </p>
       </div>
@@ -394,7 +351,6 @@ function CKRCardComponent({ item, visibleSections, visibleChannels, showEdit }: 
         </div>
 
         {consentLanguageNode && <div><Divider />{consentLanguageNode}</div>}
-        <div><Divider />{responsesNode}</div>
 
         {(visibleSections.testCodes || visibleSections.correspondingTRFs || visibleSections.thirdPartyPlatforms) && (
           <div>

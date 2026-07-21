@@ -18,6 +18,7 @@ import {
   type SuggestionType,
 } from "@/lib/search-data";
 import { getConsentMapping, testCodeMatchesFilters } from "@/lib/consent-mapping";
+import { TEST_CODE_CONSENTS } from "@/lib/consent-content";
 
 const STATUS_OPTIONS = ["Active", "Pending", "Archived"] as const;
 
@@ -237,7 +238,7 @@ function SearchPageInner() {
     setDropdownOpen(false);
     if (s.type === "test-code") {
       const code = s.sublabel ?? s.label;
-      router.push(`/test-code-details/${encodeURIComponent(code)}`);
+      router.push(TEST_CODE_CONSENTS[code] ? `/test-code/${encodeURIComponent(code)}` : `/test-code-details/${encodeURIComponent(code)}`);
       return;
     }
     if (s.type === "trf") {

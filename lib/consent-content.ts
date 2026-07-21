@@ -85,6 +85,8 @@ const LANG = {
 
   FA_PORTAL_PRENATAL: `When selecting Self Payment, by submitting this order, my patient acknowledges that they are paying for the testing ordered from Baylor Genetics on a self-pay basis and my patient hereby instructs Baylor Genetics not to submit this claim to their insurance carrier. My patient has received a Good Faith Estimate of the cost for the testing ordered, as required under the No Surprises Act, and agrees to pay Baylor Genetics for the cost of testing as outlined in that estimate. My patient understands that payment is their sole responsibility and has instructed Baylor Genetics to not submit a claim to Medicare, Medicaid, or any private insurer on my patient’s behalf.`,
 
+
+  FA_PAPER_PRENATAL: `When selecting Self Payment, by signing below, I acknowledge that I am paying for the testing ordered from Baylor Genetics on a self-pay basis and I hereby instruct Baylor Genetics not to submit this claim to my insurance carrier. I have received a Good Faith Estimate of the cost for the testing ordered, as required under the No Surprises Act, and I agree to pay Baylor Genetics for the cost of testing as outlined in that estimate. I understand that payment is my sole responsibility, and I have instructed Baylor Genetics to not submit a claim to Medicare, Medicaid, or any private insurer on my behalf.`,
   // CKR items
   CKR_SMN: `This requisition incorporates by reference as applicable Baylor Genetics’ Terms and Conditions available at: https://www.baylorgenetics.com/lab-terms-conditions/ or, in the case of international entities, https://www.baylorgenetics.com/terms-conditions-of-the-laboratory-services-international/.\n\nBy submitting this requisition, I attest to the following:\n\nMedical Necessity: The test(s) ordered are medically necessary for the risk assessment, diagnosis, monitoring, or detection of a suspected genetic condition. The results are expected to inform clinical decision-making, including diagnosis, prognosis, medical management and/or treatment.\n\nAuthorization to Order: I am authorized by law to order these test(s).\n\nEducation and Consent: I confirm that I, or my qualified designee, have provided the individual(s) tested (and/or their legal guardian) with appropriate information regarding the nature, purpose, benefits, limitations, and potential outcomes of the genetic test(s), and that informed consent for testing has been obtained in accordance with applicable laws, regulations and institutional policies, and as indicated below.\n\nComparator/Family Member Consent (if applicable): Any individual identified as a comparator (e.g., biological family member) has been provided with appropriate information regarding genetic testing, including the purpose of testing, possible results, and potential implications. Informed consent for testing has been obtained from each comparator, including consent for the return of relevant findings (e.g., ACMG-recommended secondary findings or other medically actionable results), where applicable and selected.\n\nThe individuals tested (and/or their legal guardian) have been given the opportunity to ask questions about the testing and possible results.`,
 
@@ -118,6 +120,7 @@ export interface CKRItem {
   paper: string | null;
   testCodes: string;
   trfs: string[];
+  defaultResponse: "opt-in" | "opt-out" | "required";
 }
 
 export interface SectionPageMeta {
@@ -366,6 +369,49 @@ export const SECTION_CARDS: Record<string, SectionCard[]> = {
     },
   ],
 
+  "test-reporting-and-results": [
+    {
+      consentName: "Informed Consent for WES and WGS",
+      consentSlug: "informed-consent-for-wes-and-wgs",
+      portal: LANG.TRR_WGS,
+      paper: null,
+      trfs: WGS_TRFS,
+      testCodes: WGS_CODES,
+    },
+    {
+      consentName: "Prenatal WGS/WES Consent",
+      consentSlug: "prenatal-wgs-wes-consent",
+      portal: LANG.TRR_WGS,
+      paper: null,
+      trfs: PRENATAL_TRFS,
+      testCodes: PRENATAL_CODES,
+    },
+    {
+      consentName: "General Genetic Testing Consent",
+      consentSlug: "general-genetic-testing-consent",
+      portal: LANG.TRR_GENERAL,
+      paper: null,
+      trfs: GENERAL_TRFS,
+      testCodes: GENERAL_CODES,
+    },
+    {
+      consentName: "Biochemical Genetic Consent",
+      consentSlug: "biochemical-genetic-consent",
+      portal: LANG.TRR_BIOCHEM,
+      paper: null,
+      trfs: ["Biochemical"],
+      testCodes: BIOCHEM_CODES,
+    },
+    {
+      consentName: "Huntington Disease Consent",
+      consentSlug: "huntington-disease-consent",
+      portal: LANG.TRR_HD,
+      paper: null,
+      trfs: ["Not attached to any paper TRF"],
+      testCodes: HD_CODES,
+    },
+  ],
+
   "financial-agreement": [
     {
       consentName: "Informed Consent for WES and WGS",
@@ -379,7 +425,7 @@ export const SECTION_CARDS: Record<string, SectionCard[]> = {
       consentName: "Prenatal WGS/WES Consent",
       consentSlug: "prenatal-wgs-wes-consent",
       portal: LANG.FA_PORTAL_PRENATAL,
-      paper: null,
+      paper: LANG.FA_PAPER_PRENATAL,
       trfs: ["Prenatal WGS"],
       testCodes: PRENATAL_CODES,
     },
@@ -438,7 +484,7 @@ export const CATEGORY_SECTION_CARDS: Record<string, CategorySectionCard[]> = {
     { sectionName: "Additional Reporting", sectionSlug: "additional-reporting", portal: LANG.AR_PRENATAL, paper: null, trfs: PRENATAL_TRFS, testCodes: PRENATAL_CODES },
     { sectionName: "Considerations and Limitations", sectionSlug: "considerations-and-limitations", portal: LANG.CL_SHARED, paper: null, trfs: PRENATAL_TRFS, testCodes: PRENATAL_CODES },
     { sectionName: "Confidentiality and Sample Retention", sectionSlug: "confidentiality-and-sample-retention", portal: LANG.CSR_ALL, paper: null, trfs: ["All"], testCodes: "All" },
-    { sectionName: "Financial Agreement", sectionSlug: "financial-agreement", portal: LANG.FA_PORTAL_PRENATAL, paper: null, trfs: ["Prenatal WGS"], testCodes: PRENATAL_CODES },
+    { sectionName: "Financial Agreement", sectionSlug: "financial-agreement", portal: LANG.FA_PORTAL_PRENATAL, paper: LANG.FA_PAPER_PRENATAL, trfs: ["Prenatal WGS"], testCodes: PRENATAL_CODES },
   ],
 
   "general-genetic-testing-consent": [
@@ -468,6 +514,7 @@ export const CKR_ITEMS: CKRItem[] = [
     paper: null,
     testCodes: "All TCs",
     trfs: ["All"],
+    defaultResponse: "required",
   },
   {
     slug: "use-of-data-and-specimen",
@@ -476,6 +523,7 @@ export const CKR_ITEMS: CKRItem[] = [
     paper: null,
     testCodes: "All TCs (probands and comparators)",
     trfs: ["All"],
+    defaultResponse: "opt-out",
   },
   {
     slug: "new-york-state-residents",
@@ -484,6 +532,7 @@ export const CKR_ITEMS: CKRItem[] = [
     paper: null,
     testCodes: "All TCs (probands and comparators)",
     trfs: ["All"],
+    defaultResponse: "opt-out",
   },
   {
     slug: "acmg-secondary-findings",
@@ -502,6 +551,7 @@ export const CKR_ITEMS: CKRItem[] = [
       "Prenatal Trio Whole Exome Sequencing",
       "Prenatal WGS",
     ],
+    defaultResponse: "opt-out",
   },
   {
     slug: "incidental-findings",
@@ -518,6 +568,7 @@ export const CKR_ITEMS: CKRItem[] = [
       "Whole Exome Sequencing",
       "Sequential Trio Whole Exome Sequencing",
     ],
+    defaultResponse: "opt-out",
   },
   {
     slug: "genes-no-known-disease-association",
@@ -534,6 +585,7 @@ export const CKR_ITEMS: CKRItem[] = [
       "Whole Exome Sequencing",
       "Sequential Trio Whole Exome Sequencing",
     ],
+    defaultResponse: "opt-out",
   },
   {
     slug: "mcc-studies-surrogates",
@@ -542,6 +594,7 @@ export const CKR_ITEMS: CKRItem[] = [
     paper: null,
     testCodes: "Prenatal WGS/WES: 1622, 1623, 1822, 1824, 1800, 1804",
     trfs: ["Prenatal Trio WES", "Prenatal WGS"],
+    defaultResponse: "opt-out",
   },
 ];
 

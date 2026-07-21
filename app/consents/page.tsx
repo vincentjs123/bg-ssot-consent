@@ -15,6 +15,7 @@ import {
   type Suggestion,
   type SuggestionType,
 } from "@/lib/search-data";
+import { TEST_CODE_CONSENTS } from "@/lib/consent-content";
 
 type BrowseFilter = "all" | "consent-sections" | "consent-categories" | "consents-with-responses";
 
@@ -213,7 +214,7 @@ function CategoryCard({ category }: { category: Category }) {
 
       {/* Badges */}
       <div className="flex items-center" style={{ gap: 16 }}>
-        <span style={{ ...badgeBase, color: "white", background: "var(--button-success-btn-success-bg)" }}>
+        <span style={{ ...badgeBase, color: "var(--button-primary-btn-primary-text)", background: "var(--button-success-btn-success-bg)" }}>
           {category.active} Live
         </span>
         {category.pending && (
@@ -343,7 +344,7 @@ export default function ConsentsPage() {
     setDropdownOpen(false);
     if (s.type === "test-code") {
       const code = s.sublabel ?? s.label;
-      router.push(`/test-code-details/${encodeURIComponent(code)}`);
+      router.push(TEST_CODE_CONSENTS[code] ? `/test-code/${encodeURIComponent(code)}` : `/test-code-details/${encodeURIComponent(code)}`);
       return;
     }
     if (s.type === "trf") {
