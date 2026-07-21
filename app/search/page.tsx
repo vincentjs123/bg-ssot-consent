@@ -191,11 +191,7 @@ function SearchPageInner() {
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = query.trim();
-    const detailRoute = DETAIL_ROUTES[trimmed];
-    if (detailRoute) {
-      router.push(detailRoute);
-      return;
-    }
+    if (!trimmed) return;
     router.replace(`/search?q=${encodeURIComponent(trimmed)}`);
   }
 

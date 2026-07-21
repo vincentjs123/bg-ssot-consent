@@ -334,12 +334,7 @@ export default function ConsentsPage() {
   function handleSuggestionClick(s: Suggestion) {
     setDropdownOpen(false);
     const detailRoute = DETAIL_ROUTES[s.label];
-    if (detailRoute) {
-      router.push(detailRoute);
-      return;
-    }
-    const q = s.type === "test-code" ? s.sublabel ?? s.label : s.label;
-    router.push(`/search?q=${encodeURIComponent(q)}&type=${s.type}`);
+    if (detailRoute) router.push(detailRoute);
   }
 
   function handleSearchSubmit(e: React.FormEvent) {
@@ -347,11 +342,6 @@ export default function ConsentsPage() {
     const trimmed = search.trim();
     if (!trimmed) return;
     setDropdownOpen(false);
-    const detailRoute = DETAIL_ROUTES[trimmed];
-    if (detailRoute) {
-      router.push(detailRoute);
-      return;
-    }
     router.push(`/search?q=${encodeURIComponent(trimmed)}`);
   }
 
@@ -422,7 +412,16 @@ export default function ConsentsPage() {
                     value={search}
                     onChange={(e) => handleSearchChange(e.target.value)}
                     onFocus={() => search.trim() && setDropdownOpen(true)}
-                    onKeyDown={(e) => e.key === "Escape" && setDropdownOpen(false)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") setDropdownOpen(false);
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        const trimmed = search.trim();
+                        if (!trimmed) return;
+                        setDropdownOpen(false);
+                        router.push(`/search?q=${encodeURIComponent(trimmed)}`);
+                      }
+                    }}
                     autoComplete="off"
                   />
                   {search && (
