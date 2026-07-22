@@ -6,6 +6,7 @@ import { CaretLeft, Browser, Files, Notebook, PlugsConnected, X, DotsThreeVertic
 import AppHeader from "@/components/AppHeader";
 import { useRole } from "@/lib/useRole";
 import { canManage } from "@/lib/role";
+import { LinkedTestCodes, LinkedTRFs } from "@/components/ConsentCardLinks";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -349,16 +350,14 @@ function ConsentCardComponent({ card, visibleSections, visibleChannels, showEdit
   const testCodesNode = visibleSections.testCodes ? (
     <div className="flex flex-col" style={{ gap: 8 }}>
       <p style={sectionLabel}>Test Codes</p>
-      <p style={bodyText}>{card.testCodes}</p>
+      <LinkedTestCodes value={card.testCodes} />
     </div>
   ) : null;
 
   const trfsNode = visibleSections.correspondingTRFs ? (
     <div className="flex flex-col" style={{ gap: 8 }}>
       <p style={sectionLabel}>TRFs</p>
-      <div className="flex flex-col">
-        {card.correspondingTRFs.map((t, i) => <p key={i} style={bodyText}>{t}</p>)}
-      </div>
+      <LinkedTRFs trfs={card.correspondingTRFs} />
     </div>
   ) : null;
 
