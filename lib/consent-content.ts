@@ -211,6 +211,7 @@ export const CATEGORY_META: Record<string, CategoryPageMeta> = {
 // Each entry is an array of cards (one per stand-alone consent) for that section page.
 
 export interface SectionCard {
+  id?: string;
   consentName: string;
   consentSlug: string;
   portal: string;
@@ -218,6 +219,7 @@ export interface SectionCard {
   trfs: string[];
   testCodes: string;
   isGap?: boolean;
+  status?: "Live" | "Pending";
 }
 
 export const SECTION_CARDS: Record<string, SectionCard[]> = {
@@ -371,12 +373,23 @@ export const SECTION_CARDS: Record<string, SectionCard[]> = {
 
   "test-reporting-and-results": [
     {
+      id: "informed-consent-for-wes-and-wgs-live",
       consentName: "Informed Consent for WES and WGS",
       consentSlug: "informed-consent-for-wes-and-wgs",
       portal: LANG.TRR_WGS,
       paper: null,
       trfs: WGS_TRFS,
       testCodes: WGS_CODES,
+    },
+    {
+      id: "informed-consent-for-wes-and-wgs-pending",
+      consentName: "Informed Consent for WES and WGS",
+      consentSlug: "informed-consent-for-wes-and-wgs",
+      portal: LANG.TRR_WGS,
+      paper: null,
+      trfs: WGS_TRFS,
+      testCodes: WGS_CODES,
+      status: "Pending",
     },
     {
       consentName: "Prenatal WGS/WES Consent",

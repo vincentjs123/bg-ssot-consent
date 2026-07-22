@@ -286,9 +286,9 @@ function ConsentCardComponent({ card, visibleSections, visibleChannels, showEdit
 
   return (
     <div className="flex flex-col border border-border-subtle rounded-[4px] overflow-hidden" style={{ alignSelf: "start" }}>
-      <div style={{ background: "var(--deepblue-color-primary-500)", padding: "8px 12px", minHeight: 88, display: "flex", alignItems: "center" }}>
+      <div style={{ background: card.status === "Pending" ? "var(--button-caution-btn-caution-bg)" : "var(--deepblue-color-primary-500)", padding: "8px 12px", minHeight: 88, display: "flex", alignItems: "center" }}>
         <Link href={`/consent-category/${card.consentSlug}`} style={{ textDecoration: "none" }}>
-          <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 28, lineHeight: "36px", letterSpacing: "-0.14px", color: "var(--button-primary-btn-primary-text)", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+          <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 28, lineHeight: "36px", letterSpacing: "-0.14px", color: card.status === "Pending" ? "var(--text-text-primary)" : "var(--button-primary-btn-primary-text)", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
             {card.consentName}
           </p>
         </Link>
@@ -301,7 +301,7 @@ function ConsentCardComponent({ card, visibleSections, visibleChannels, showEdit
             <ActionsMenu showEdit={showEdit} />
           </div>
           <div className="flex items-center" style={{ gap: 8 }}>
-            <span style={statusChipStyle("Live")}>Live</span>
+            <span style={statusChipStyle(card.status ?? "Live")}>{card.status ?? "Live"}</span>
             <span style={{ ...bodyText, fontSize: 14, whiteSpace: "pre" }}>Version 2.0  |  TBD</span>
           </div>
         </div>
@@ -456,13 +456,13 @@ export default function ConsentSectionSlugPage() {
 
   const meta = SECTION_META[slug];
   const cards = SECTION_CARDS[slug] ?? [];
-  const allConsentNames = cards.map((c) => c.consentName);
+  const allConsentNames = [...new Set(cards.map((c) => c.consentName))];
 
   // CWR titles applicable to any consent on this section page
   const activeCWRTitles = new Set(
     cards.flatMap((c) => CKR_FOR_CONSENT[c.consentSlug] ?? [])
   );
-  const activeStatuses = new Set<StatusFilter>(["Live"]);
+  const activeStatuses = new Set<StatusFilter>(cards.map((c) => c.status ?? "Live"));
 
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const [visibleConsents, setVisibleConsents] = useState<Set<string>>(new Set(allConsentNames));
@@ -570,9 +570,9 @@ export default function ConsentSectionSlugPage() {
 
             <div className="flex-1 min-w-0">
               <div className="grid w-full" style={{ gridTemplateColumns: visibleCards.length === 1 ? "1fr" : "repeat(2, 1fr)", gap: 24, alignItems: "start" }}>
-                {visibleCards.length > 0 ? visibleCards.map((card) => (
+                {visibleCards.length > 0 ? visibleCards.map((card, i) => (
                   <ConsentCardComponent
-                    key={card.consentSlug}
+                    key={card.id ?? `${card.consentSlug}-${i}`}
                     card={card}
                     visibleSections={visibleSections}
                     visibleChannels={visibleChannels}
