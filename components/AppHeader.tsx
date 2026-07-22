@@ -52,7 +52,7 @@ export default function AppHeader({ domain, activeTab, showCreateConsent = false
   const menuRef = useRef<HTMLDivElement>(null);
 
   const config = DOMAIN_CONFIG[domain];
-  const showStatusQueue = canManage(role);
+  const showStatusQueue = false && canManage(role);
 
   const TABS: { id: AppTab; label: string; icon: string; href: string }[] = [
     { id: config.tabId, label: config.label, icon: config.icon, href: config.href },
