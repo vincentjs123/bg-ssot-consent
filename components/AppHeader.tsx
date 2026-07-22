@@ -52,12 +52,12 @@ export default function AppHeader({ domain, activeTab, showCreateConsent = false
   const menuRef = useRef<HTMLDivElement>(null);
 
   const config = DOMAIN_CONFIG[domain];
-  const showStatusQueue = false && canManage(role);
+  const showStatusQueue = canManage(role);
 
-  const TABS: { id: AppTab; label: string; icon: string; href: string }[] = [
+  const TABS: { id: AppTab; label: string; icon: string; href: string; inactive?: boolean }[] = [
     { id: config.tabId, label: config.label, icon: config.icon, href: config.href },
     ...(showStatusQueue
-      ? [{ id: "status-queue" as AppTab, label: "Status Queue", icon: "/assets/queue.png", href: config.statusQueueHref }]
+      ? [{ id: "status-queue" as AppTab, label: "Status Queue", icon: "/assets/queue.png", href: config.statusQueueHref, inactive: true }]
       : []),
   ];
 
@@ -187,6 +187,20 @@ export default function AppHeader({ domain, activeTab, showCreateConsent = false
           <div className="flex items-start flex-1" style={{ gap: 60 }}>
             {TABS.map((tab) => {
               const isActive = tab.id === activeTab;
+              if (tab.inactive) {
+                return (
+                  <div key={tab.id} className="flex flex-col items-start" style={{ height: 50, cursor: "default", opacity: 0.38, pointerEvents: "none" }}>
+                    <div className="flex items-center justify-center" style={{ padding: 12, gap: 8, borderTopLeftRadius: 2, borderTopRightRadius: 2 }}>
+                      <div style={{ width: 24, height: 24, position: "relative", flexShrink: 0 }}>
+                        <Image src={tab.icon} alt="" fill sizes="24px" className="object-contain" />
+                      </div>
+                      <span className="text-text-primary whitespace-nowrap" style={{ fontFamily: "var(--font-barlow), sans-serif", fontSize: "var(--font-size-font-size-body-lg)", fontWeight: "var(--font-weight-font-weight-body-lg-regular)", lineHeight: "var(--font-line-height-line-height-body-lg)" }}>
+                        {tab.label}
+                      </span>
+                    </div>
+                  </div>
+                );
+              }
               return (
                 <Link key={tab.id} href={tab.href} className="flex flex-col items-start" style={{ height: 50 }}>
                   <div

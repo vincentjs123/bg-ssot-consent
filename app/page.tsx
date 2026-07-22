@@ -6,9 +6,9 @@ import Image from "next/image";
 import { saveRole, clearRole, UserRole } from "@/lib/role";
 
 const DOMAINS = [
-  { id: "test-codes", label: "Test Codes", icon: "/assets/test-kit.png", href: "/dashboard" },
+  { id: "test-codes", label: "Test Codes", icon: "/assets/test-kit.png", href: "/dashboard", inactive: true },
   { id: "consents", label: "Consents", icon: "/assets/icon.png", href: "/consents" },
-  { id: "payers", label: "Payers", icon: "/assets/insurance.png", href: "/dashboard" },
+  { id: "payers", label: "Payers", icon: "/assets/insurance.png", href: "/dashboard", inactive: true },
 ];
 
 const DOMAIN_ROLES: Record<string, { id: string; title: string; permissions: string[] }[]> = {
@@ -52,6 +52,7 @@ const DOMAIN_ROLES: Record<string, { id: string; title: string; permissions: str
     {
       id: "viewer",
       title: "Viewer",
+      inactive: true,
       permissions: [
         "View all consent records",
         "Search and filter consent data",
@@ -205,12 +206,13 @@ export default function RoleSelection() {
               return (
                 <button
                   key={domain.id}
-                  onClick={() => handleDomainSelect(domain.id)}
+                  onClick={() => !domain.inactive && handleDomainSelect(domain.id)}
                   className="flex flex-col flex-1 items-center justify-center bg-bg-page rounded-[4px]"
                   style={{
                     padding: "28px 24px",
                     gap: 16,
-                    cursor: "pointer",
+                    cursor: domain.inactive ? "default" : "pointer",
+                    opacity: domain.inactive ? 0.38 : 1,
                     border: isSelected
                       ? "2px solid var(--borders-border-primary, var(--text-text-primary))"
                       : "1px solid var(--borders-border-subtle, var(--borders-border-subtle))",
@@ -265,12 +267,13 @@ export default function RoleSelection() {
                   return (
                     <button
                       key={role.id}
-                      onClick={() => setSelectedRole(role.id)}
+                      onClick={() => !role.inactive && setSelectedRole(role.id)}
                       className="flex flex-col flex-1 items-start bg-bg-page rounded-[4px] text-left"
                       style={{
                         padding: 24,
                         gap: 12,
-                        cursor: "pointer",
+                        cursor: role.inactive ? "default" : "pointer",
+                        opacity: role.inactive ? 0.38 : 1,
                         border: isSelected
                           ? "2px solid var(--borders-border-primary, var(--text-text-primary))"
                           : "1px solid var(--borders-border-subtle, var(--borders-border-subtle))",
