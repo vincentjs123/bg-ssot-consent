@@ -11,7 +11,7 @@ const DOMAINS = [
   { id: "payers", label: "Payers", icon: "/assets/insurance.png", href: "/dashboard", inactive: true },
 ];
 
-const DOMAIN_ROLES: Record<string, { id: string; title: string; permissions: string[] }[]> = {
+const DOMAIN_ROLES: Record<string, { id: string; title: string; inactive?: boolean; permissions: string[] }[]> = {
   "test-codes": [
     {
       id: "viewer",
