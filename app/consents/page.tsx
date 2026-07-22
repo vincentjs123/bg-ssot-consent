@@ -198,8 +198,8 @@ function CategoryCard({ category }: { category: Category }) {
         <div style={{ width: "100%", height: 1, background: "var(--borders-border-subtle)" }} />
       </div>
 
-      {/* Description */}
-      <p
+      {/* Description — hidden on landing page */}
+      {/* <p
         style={{
           fontFamily: "var(--font-barlow), sans-serif",
           fontWeight: 400,
@@ -210,7 +210,7 @@ function CategoryCard({ category }: { category: Category }) {
         }}
       >
         {category.description}
-      </p>
+      </p> */}
 
       {/* Badges */}
       <div className="flex items-center" style={{ gap: 16 }}>
