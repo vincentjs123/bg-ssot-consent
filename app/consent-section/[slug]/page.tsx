@@ -170,13 +170,15 @@ const statusChipStyle = (status: CardStatus): React.CSSProperties => ({
 
 // ─── Actions Menu ─────────────────────────────────────────────────────────────
 
-function ActionsMenu({ showEdit }: { showEdit: boolean }) {
+function ActionsMenu({ showEdit, onOpenChange }: { showEdit: boolean; onOpenChange: (open: boolean) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  const toggle = (v: boolean) => { setOpen(v); onOpenChange(v); };
+
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) toggle(false);
     }
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -192,20 +194,17 @@ function ActionsMenu({ showEdit }: { showEdit: boolean }) {
       <button
         className="flex items-center justify-center"
         style={{ width: 24, height: 24 }}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => toggle(!open)}
       >
         <DotsThreeVertical size={20} weight="bold" className="text-text-primary" />
       </button>
       {open && (
-        <div style={{
+        <div className="bg-bg-page border border-border-subtle shadow-dropdown" style={{
           position: "absolute",
           top: "calc(100% + 4px)",
           right: 0,
-          background: "var(--bg-bg-page)",
-          border: "1px solid var(--borders-border-subtle)",
           borderRadius: 4,
-          boxShadow: "0px 4px 12px var(--bg-ssot-shadow-dropdown)",
-          zIndex: 20,
+          zIndex: 50,
           minWidth: 160,
           padding: "4px 0",
         }}>
@@ -213,7 +212,7 @@ function ActionsMenu({ showEdit }: { showEdit: boolean }) {
             <Link
               key={item}
               href={item === "Edit" ? "/edit-consent" : item === "View History" ? "/consent-version-history" : "#"}
-              onClick={() => setOpen(false)}
+              onClick={() => toggle(false)}
               className="flex items-center w-full hover:bg-bg-body"
               style={{ padding: "10px 16px", ...bodyText, textDecoration: "none", fontSize: 14 }}
             >
@@ -236,6 +235,7 @@ interface CardProps {
 }
 
 function ConsentCardComponent({ card, visibleSections, visibleChannels, showEdit }: CardProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
   const shownChannels = ALL_CHANNELS.filter((ch) => visibleChannels.has(ch));
   const paragraphs = card.portal.split("\n\n");
 
@@ -285,8 +285,8 @@ function ConsentCardComponent({ card, visibleSections, visibleChannels, showEdit
   const hasMiddle = testCodesNode || trfsNode || thirdPartyNode;
 
   return (
-    <div className="flex flex-col border border-border-subtle rounded-[4px] overflow-hidden" style={{ alignSelf: "start" }}>
-      <div style={{ background: card.status === "Pending" ? "var(--button-caution-btn-caution-bg)" : "var(--deepblue-color-primary-500)", padding: "8px 12px", minHeight: 88, display: "flex", alignItems: "center" }}>
+    <div className="flex flex-col border border-border-subtle rounded-[4px]" style={{ alignSelf: "start", position: "relative", zIndex: menuOpen ? 10 : 0 }}>
+      <div style={{ background: card.status === "Pending" ? "var(--button-caution-btn-caution-bg)" : "var(--deepblue-color-primary-500)", padding: "8px 12px", minHeight: 88, display: "flex", alignItems: "center", borderRadius: "4px 4px 0 0" }}>
         <Link href={`/consent-category/${card.consentSlug}`} style={{ textDecoration: "none" }}>
           <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 28, lineHeight: "36px", letterSpacing: "-0.14px", color: card.status === "Pending" ? "var(--text-text-primary)" : "var(--button-primary-btn-primary-text)", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
             {card.consentName}
@@ -298,7 +298,7 @@ function ConsentCardComponent({ card, visibleSections, visibleChannels, showEdit
         <div className="flex flex-col" style={{ gap: 8 }}>
           <div className="flex items-center justify-between w-full">
             <p style={sectionLabel}>Status</p>
-            <ActionsMenu showEdit={showEdit} />
+            <ActionsMenu showEdit={showEdit} onOpenChange={setMenuOpen} />
           </div>
           <div className="flex items-center" style={{ gap: 8 }}>
             <span style={statusChipStyle(card.status ?? "Live")}>{card.status ?? "Live"}</span>
