@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CaretLeft, Browser, Files, Notebook, PlugsConnected } from "@phosphor-icons/react";
 import AppHeader from "@/components/AppHeader";
 import { CKR_ITEMS, type CKRItem } from "@/lib/consent-content";
+import { LinkedTestCodes, LinkedTRFs } from "@/components/ConsentCardLinks";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -208,14 +209,12 @@ function CKRDetail({ item }: { item: CKRItem }) {
           <div className="flex items-start w-full" style={{ gap: 24 }}>
             <div className="flex flex-col flex-1 min-w-0" style={{ gap: 8 }}>
               <p style={sectionLabel}>Test Codes</p>
-              {item.testCodes.split("\n\n").map((block, i) => (
-                <p key={i} style={bodyText}>{block}</p>
-              ))}
+              <LinkedTestCodes value={item.testCodes} />
             </div>
             <div className="flex flex-col flex-1 min-w-0" style={{ gap: 16 }}>
               <div className="flex flex-col" style={{ gap: 8 }}>
                 <p style={sectionLabel}>TRFs</p>
-                {item.trfs.map((t, i) => <p key={i} style={bodyText}>{t}</p>)}
+                <LinkedTRFs trfs={item.trfs} />
               </div>
               <div className="flex flex-col" style={{ gap: 8 }}>
                 <p style={sectionLabel}>3rd Party Platforms</p>

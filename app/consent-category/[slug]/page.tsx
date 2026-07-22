@@ -16,6 +16,7 @@ import {
   type CategorySectionCard,
   type CKRItem,
 } from "@/lib/consent-content";
+import { LinkedTestCodes, LinkedTRFs } from "@/components/ConsentCardLinks";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -235,16 +236,14 @@ function SectionCardComponent({ card, visibleSections, visibleChannels, showEdit
   const testCodesNode = visibleSections.testCodes ? (
     <div className="flex flex-col" style={{ gap: 8 }}>
       <p style={sectionLabel}>Test Codes</p>
-      <p style={bodyText}>{card.testCodes}</p>
+      <LinkedTestCodes value={card.testCodes} />
     </div>
   ) : null;
 
   const trfsNode = visibleSections.correspondingTRFs ? (
     <div className="flex flex-col" style={{ gap: 8 }}>
       <p style={sectionLabel}>TRFs</p>
-      <div className="flex flex-col">
-        {card.trfs.map((t, i) => <p key={i} style={bodyText}>{t}</p>)}
-      </div>
+      <LinkedTRFs trfs={card.trfs} />
     </div>
   ) : null;
 
@@ -359,9 +358,7 @@ function CKRCardComponent({ item, visibleSections, visibleChannels, showEdit }: 
               {visibleSections.testCodes && (
                 <div className="flex flex-col flex-1 min-w-0" style={{ gap: 8 }}>
                   <p style={sectionLabel}>Test Codes</p>
-                  {item.testCodes.split("\n\n").map((block, i) => (
-                    <p key={i} style={bodyText}>{block}</p>
-                  ))}
+                  <LinkedTestCodes value={item.testCodes} />
                 </div>
               )}
               {(visibleSections.correspondingTRFs || visibleSections.thirdPartyPlatforms) && (
@@ -369,7 +366,7 @@ function CKRCardComponent({ item, visibleSections, visibleChannels, showEdit }: 
                   {visibleSections.correspondingTRFs && (
                     <div className="flex flex-col" style={{ gap: 8 }}>
                       <p style={sectionLabel}>TRFs</p>
-                      {item.trfs.map((t, i) => <p key={i} style={bodyText}>{t}</p>)}
+                      <LinkedTRFs trfs={item.trfs} />
                     </div>
                   )}
                   {visibleSections.thirdPartyPlatforms && (

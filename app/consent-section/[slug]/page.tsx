@@ -14,6 +14,7 @@ import {
   CKR_FOR_CONSENT,
   type SectionCard as ContentSectionCard,
 } from "@/lib/consent-content";
+import { LinkedTestCodes, LinkedTRFs } from "@/components/ConsentCardLinks";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -252,16 +253,14 @@ function ConsentCardComponent({ card, visibleSections, visibleChannels, showEdit
   const testCodesNode = visibleSections.testCodes ? (
     <div className="flex flex-col" style={{ gap: 8 }}>
       <p style={sectionLabel}>Test Codes</p>
-      <p style={bodyText}>{card.testCodes}</p>
+      <LinkedTestCodes value={card.testCodes} />
     </div>
   ) : null;
 
   const trfsNode = visibleSections.correspondingTRFs ? (
     <div className="flex flex-col" style={{ gap: 8 }}>
       <p style={sectionLabel}>TRFs</p>
-      <div className="flex flex-col">
-        {card.trfs.map((t, i) => <p key={i} style={bodyText}>{t}</p>)}
-      </div>
+      <LinkedTRFs trfs={card.trfs} />
     </div>
   ) : null;
 
