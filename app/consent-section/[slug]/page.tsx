@@ -170,7 +170,7 @@ const statusChipStyle = (status: CardStatus): React.CSSProperties => ({
 
 // ─── Actions Menu ─────────────────────────────────────────────────────────────
 
-function ActionsMenu({ showEdit, onOpenChange }: { showEdit: boolean; onOpenChange: (open: boolean) => void }) {
+function ActionsMenu({ showEdit, name, onOpenChange }: { showEdit: boolean; name: string; onOpenChange: (open: boolean) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -211,7 +211,7 @@ function ActionsMenu({ showEdit, onOpenChange }: { showEdit: boolean; onOpenChan
           {items.map((item) => (
             <Link
               key={item}
-              href={item === "Edit" ? "/edit-consent" : item === "View History" ? "/consent-version-history" : "#"}
+              href={item === "Edit" ? `/edit-consent?name=${encodeURIComponent(name)}` : item === "View History" ? "/consent-version-history" : "#"}
               onClick={() => toggle(false)}
               className="flex items-center w-full hover:bg-bg-body"
               style={{ padding: "10px 16px", ...bodyText, textDecoration: "none", fontSize: 14 }}
@@ -298,7 +298,7 @@ function ConsentCardComponent({ card, visibleSections, visibleChannels, showEdit
         <div className="flex flex-col" style={{ gap: 8 }}>
           <div className="flex items-center justify-between w-full">
             <p style={sectionLabel}>Status</p>
-            <ActionsMenu showEdit={showEdit} onOpenChange={setMenuOpen} />
+            <ActionsMenu showEdit={showEdit} name={card.consentName} onOpenChange={setMenuOpen} />
           </div>
           <div className="flex items-center" style={{ gap: 8 }}>
             <span style={statusChipStyle(card.status ?? "Live")}>{card.status ?? "Live"}</span>
